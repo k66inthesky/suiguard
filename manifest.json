@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "SUI Guard",
+  "version": "0.0",
+  "description": "檢測SUI區塊鏈地址是否在官方黑名單中，並允許用戶回報可疑地址",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://raw.githubusercontent.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "SUI Blocklist Detector"
+  },
+  "icons": {
+    "16": "logo16.png",
+    "48": "logo48.png",
+    "128": "logo128.png"
+  }
+}
+

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 首頁：兩個大按鈕 -->
+        <div id="homePage" class="page">
+            <!-- 新增：Logo 區塊 -->
+            <div class="logo-section">
+                <img src="logo16.png" alt="SUI Guard Logo" class="logo">
+            </div>
+            
+            <h1>SUI Guard</h1>
+            
+            <div class="home-buttons">
+                <button id="checkPageBtn" class="main-btn check-btn">
+                    <div class="btn-icon">🔍</div>
+                    <div class="btn-title">SUI黑名單檢測</div>
+                    <div class="btn-subtitle">檢查地址是否在官方黑名單</div>
+                </button>
+                
+                <button id="reportPageBtn" class="main-btn report-btn">
+                    <div class="btn-icon">⚠️</div>
+                    <div class="btn-title">回報可疑地址</div>
+                    <div class="btn-subtitle">回報發現的可疑地址</div>
+                </button>
+            </div>
+
+            <!-- 新增：作者信息區塊 -->
+            <div class="author-section">
+                <p class="author-info">
+                    Made by <a href="https://github.com/k66inthesky" target="_blank" class="author-link">k66</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- 檢測頁面 -->
+        <div id="checkPage" class="page hidden">
+            <div class="page-header">
+                <button id="backFromCheck" class="back-btn">← 返回</button>
+                <h2>🔍 黑名單檢測</h2>
+            </div>
+            
+            <div class="input-group">
+                <label for="addressType">地址類型:</label>
+                <select id="addressType">
+                    <option value="coin">Coin Address</option>
+                    <option value="object">Object ID</option>
+                    <option value="domain">Domain</option>
+                    <option value="package">Package ID</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="addressInput">輸入地址:</label>
+                <textarea id="addressInput" placeholder="請輸入要檢測的地址..."></textarea>
+            </div>
+            
+            <button id="checkBtn" class="btn btn-primary">🔍 檢測黑名單</button>
+            
+            <div id="checkResult" class="result-box"></div>
+        </div>
+
+        <!-- 回報頁面 -->
+        <div id="reportPage" class="page hidden">
+            <div class="page-header">
+                <button id="backFromReport" class="back-btn">← 返回</button>
+                <h2>⚠️ 回報可疑地址</h2>
+            </div>
+            
+            <div class="input-group">
+                <label for="reportType">回報類型:</label>
+                <select id="reportType">
+                    <option value="coin">Coin Address</option>
+                    <option value="object">Object ID</option>
+                    <option value="domain">Domain</option>
+                    <option value="package">Package ID</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="reportAddress">可疑地址:</label>
+                <textarea id="reportAddress" placeholder="請輸入可疑地址..."></textarea>
+            </div>
+            
+            <div class="input-group">
+                <label for="reportReason">原因描述:</label>
+                <textarea id="reportReason" placeholder="請描述為什麼認為此地址可疑..."></textarea>
+            </div>
+            
+            <button id="reportBtn" class="btn btn-secondary">📝 提交回報</button>
+            
+            <div id="reportResult" class="result-box"></div>
+        </div>
+        
+        <div class="footer">
+            <p id="statusText">📡 資料來源: MystenLabs Official Blocklist</p>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
+
