@@ -149,9 +149,12 @@ Sep. 7, 2025 - Decide key functions(user report, parse string, sign check, AI sm
 - 使用 Issue 模板提供詳細資訊
 - 歡迎讓我知道你對防呆/防亂設計的想法！
 
-## 開發者
+## Team Member
 
-👨‍💻 **k66** - [GitHub Profile](https://github.com/k66inthesky)
+👨‍💻 **k66** - [k66's GitHub Profile](https://github.com/k66inthesky)
+
+👨‍💻 **Emily** - [Emily's GitHub Profile](https://github.com/lienweb)
+
 
 ## 授權條款
 
