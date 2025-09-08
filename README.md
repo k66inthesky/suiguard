@@ -8,7 +8,12 @@
 
 https://github.com/user-attachments/assets/730de456-5851-405e-80a8-20d0d8030459
 
-### 初衷 & 誠摯邀請你加入
+---
+## Meeting Notes 會議紀要
+Sep. 7, 2025 - Decide key functions(user report, parse string, sign check, AI smart contract check, security bagde) and daily tasks in this week.
+
+---
+### Goal & Welcome to join us! 初衷 & 誠摯邀請你加入
 - web3被盜事件太多，想做公益項目造福大家。
   > 例如今年2月Bybit被盜15億美元、5月Cetus被盜2.2億美元。我先拋磚引玉做出初版，期待我們一起做出更助人的web3防禦工具!
 - 因參加SUI 9月黑客松，故選在SUI鏈。
@@ -17,7 +22,8 @@ https://github.com/user-attachments/assets/730de456-5851-405e-80a8-20d0d8030459
   - **歡迎開issue討論(tag打idea)，或者**
   - **在SUI線下工作坊討論(期待你準備一張系統架構圖或產品設計藍圖)**
 
-## 功能特色
+
+## Features 功能特色
 
 ### 🔍 SUI黑名單檢測
 - 實時檢測 Coin Address、Object ID、Domain、Package ID 是否在官方黑名單
