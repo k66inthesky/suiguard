@@ -10,7 +10,11 @@ https://github.com/user-attachments/assets/730de456-5851-405e-80a8-20d0d8030459
 
 ---
 ## Meeting Notes 會議紀要
-Sep. 7, 2025 - Decide key functions(user report, parse string, sign check, AI smart contract check, security bagde) and daily tasks in this week.
+<details>
+<summary>Sep. 7, 2025 - Decide key functions(user report, parse string, sign check, AI smart contract check, security bagde) and daily tasks in this week.</summary>
+&nbsp;&nbsp;&nbsp;&nbsp;Team collaboration rules, ask for data authorization, and study how to implement sui sign check
+</details>
+
 
 ---
 ### Goal & Welcome to join us! 初衷 & 誠摯邀請你加入
