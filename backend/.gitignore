@@ -1,0 +1,96 @@
+# Python virtual environment
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment variables
+.env
+.env.local
+.env.prod
+.env.*
+config.json
+settings_local.py
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+log/
+
+# Temporary files
+.DS_Store
+Thumbs.db
+.cache/
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Secret files
+*secret*
+*key*
+*password*
+*token*
+credentials.json
+
+# System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# FastAPI
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+database/
+data/
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# 測試覆蓋率
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# 文檔建構
+docs/_build/
+
+# PyBuilder
+target/
+
+# 套件相關
+*.egg-info/
+dist/
+build/
