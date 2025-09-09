@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="extension/public/icons/logo16.png" alt="SUI Guard Logo" width="64" height="64">
+  <img src="extension/icons/logo16.png" alt="SUI Guard Logo" width="64" height="64">
 </div>
 
 # SUI Guard
