@@ -20,27 +20,18 @@ https://github.com/user-attachments/assets/730de456-5851-405e-80a8-20d0d8030459
 - web3 被盜事件太多，想做公益項目造福大家。
   > 即使是相對安全的 Sui，其生態系的協議也在不斷受到威脅。例如 2025 年 5 月 Cetus 被盜$0.22B、9 月 nemo protocol 被盜$3M。故我們 SuiGuard 團隊期待與您一起做出更助人的 web3 防禦工具！
 
+
 ## Features 功能特色
 
-### 🔍 SUI 黑名單檢測
-- 實時檢測 Coin Address、Object ID、Domain、Package ID 是否在官方黑名單
-- 支援批量檢測（多行輸入）
-- 直接從 MystenLabs 官方 GitHub 倉庫獲取最新黑名單數據
-- 詳細的檢測結果視覺化顯示
+> 詳細功能介紹請參考 [簡報；簡報會再更新](https://github.com/k66inthesky/suiguard/blob/main/SuiGuard%20-%20Blockchain%20Security%20Solution%20PitchBlue%20And%20White%20Modern%20Illustrative%20Data%20Privacy%20and%20Protection%20Presentation.pdf)第三頁的 5 點：
 
-### ⚠️ 回報可疑地址
-- 結構化回報表單
-- 支援四種地址類型回報
-- 本地存儲回報記錄
-- 感謝訊息確認機制
+1. Sui 版 whoscall - 即時黑名單偵測與回報
+2. 用 ML 模型分析智能合約安全性，並做以下事情：
+   - Sign check - 方便用戶在簽名前，做快速合約檢查
+   - 3-color security light - 讓用戶一眼看出目前瀏覽的網站安全性
+   - Security badge - 讓用戶在瀏覽器上看到網站的安全徽章
+3. Real-time webhook notification - 鏈上有大事時即時通知企業用戶(像是 SUI 生態系的 protocols, wallet, DeFi, NFT marketplace, Memecoins 等項目方)
 
-## 技術特色
-
-- ✅ Chrome Manifest V3 規範
-- ✅ 實時 GitHub API 資料獲取
-- ✅ 完整錯誤處理和除錯功能
-- ✅ 支援鍵盤快捷鍵（Enter 檢測）
-- ✅ 本地資料存儲功能
 
 ## 安裝方式
 
@@ -51,17 +42,6 @@ https://github.com/user-attachments/assets/730de456-5851-405e-80a8-20d0d8030459
 4. 開啟「開發人員模式」
 5. 點擊「載入未封裝項目」
 6. 選擇 suiguard 資料夾
-
-## 功能介紹
-
-> 詳細功能介紹請參考 [簡報；簡報會再更新](https://github.com/k66inthesky/suiguard/blob/main/SuiGuard%20-%20Blockchain%20Security%20Solution%20PitchBlue%20And%20White%20Modern%20Illustrative%20Data%20Privacy%20and%20Protection%20Presentation.pdf)第三頁的 5 點：
-
-1. Sui 版 whoscall - 即時黑名單偵測與回報
-2. 用 ML 模型分析智能合約安全性，並做以下事情：
-   - Sign check - 方便用戶在簽名前，做快速合約檢查
-   - 3-color security light - 讓用戶一眼看出目前瀏覽的網站安全性
-   - Security badge - 讓用戶在瀏覽器上看到網站的安全徽章
-3. Real-time webhook notification - 鏈上有大事時即時通知企業用戶(像是 SUI 生態系的 protocols, wallet, DeFi, NFT marketplace, Memecoins 等項目方)
 
 ## Real-Time Blacklist 初版資料來源
 
@@ -81,7 +61,7 @@ https://github.com/user-attachments/assets/730de456-5851-405e-80a8-20d0d8030459
 - **API**: GitHub Raw API
 - **存儲**: Chrome Storage API
 - **架構**: Chrome Extension Manifest V3
-- **後端**: Jest, React Testing Library
+- **後端**: Python3.12 FastAPI, Jest, React Testing Library
 
 ## 貢獻指南
 
