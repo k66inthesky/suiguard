@@ -12,8 +12,9 @@ https://github.com/user-attachments/assets/730de456-5851-405e-80a8-20d0d8030459
 ## Meeting Notes 會議紀要
 
 - Sep. 07, 2025 - Decide key functions(user report, parse string, sign check, AI smart contract check, security badge) and daily tasks in this week.
-- Sep. 08, 2025 - Decide Team collaboration rules, ask for data authorization, and study how to implement sui sign check
-- Sep. 9, 2025 - Complete implement sui sign check
+- Sep. 08, 2025 - Decide Team collaboration rules, ask for data authorization, and study how to implement sui sign check.
+- Sep. 09, 2025 - Complete implement sui sign check.
+- Sep. 10, 2025 - HOH weekly report, labeling, manually monitor and do cross verification while approve action in wallet. 
 
 ---
 ### Goal & Welcome to join us! 初衷 & 誠摯邀請你加入
@@ -23,7 +24,7 @@ https://github.com/user-attachments/assets/730de456-5851-405e-80a8-20d0d8030459
 
 ## Features 功能特色
 
-> 詳細功能介紹請參考 [簡報；簡報會再更新](https://github.com/k66inthesky/suiguard/blob/main/SuiGuard%20-%20Blockchain%20Security%20Solution%20PitchBlue%20And%20White%20Modern%20Illustrative%20Data%20Privacy%20and%20Protection%20Presentation.pdf)第三頁的 5 點：
+> 詳細功能介紹請參考 [簡報(會再更新)](https://github.com/k66inthesky/suiguard/tree/main/docs)第三頁的 5 點：
 
 1. Sui 版 whoscall - 即時黑名單偵測與回報
 2. 用 ML 模型分析智能合約安全性，並做以下事情：
@@ -31,17 +32,6 @@ https://github.com/user-attachments/assets/730de456-5851-405e-80a8-20d0d8030459
    - 3-color security light - 讓用戶一眼看出目前瀏覽的網站安全性
    - Security badge - 讓用戶在瀏覽器上看到網站的安全徽章
 3. Real-time webhook notification - 鏈上有大事時即時通知企業用戶(像是 SUI 生態系的 protocols, wallet, DeFi, NFT marketplace, Memecoins 等項目方)
-
-
-## 安裝方式
-
-### 開發者安裝
-1. 下載或克隆此倉庫
-2. 打開 Chrome 瀏覽器
-3. 前往 `chrome://extensions/`
-4. 開啟「開發人員模式」
-5. 點擊「載入未封裝項目」
-6. 選擇 suiguard 資料夾
 
 ## Real-Time Blacklist 初版資料來源
 
@@ -54,6 +44,17 @@ https://github.com/user-attachments/assets/730de456-5851-405e-80a8-20d0d8030459
 - package-list.json
 
 預期將用戶提交的黑名單：我們自己 own 一個，也分享回報給[MystenLabs](https://github.com/MystenLabs/wallet_blocklist)或[suiet](https://github.com/suiet/guardians)。
+
+
+## 安裝方式
+
+### 開發者安裝
+1. 下載或克隆此倉庫
+2. 打開 Chrome 瀏覽器
+3. 前往 `chrome://extensions/`
+4. 開啟「開發人員模式」
+5. 點擊「載入未封裝項目」
+6. 選擇 suiguard 資料夾
 
 ## 技術棧
 
@@ -82,9 +83,9 @@ https://github.com/user-attachments/assets/730de456-5851-405e-80a8-20d0d8030459
 
 ## Team Member 團隊成員
 
-👨‍💻 **Backend, CI/CD** - [k66](https://github.com/k66inthesky)
+👨‍💻 [k66](https://github.com/k66inthesky) - Backend, ML, CI/CD, System Design
 
-👨‍💻 **Frontend, UI/UX** - [Emily](https://github.com/lienweb)
+👨‍💻 [Emily](https://github.com/lienweb) - Frontend, UI/UX, System Design
 
 ## 授權條款
 
