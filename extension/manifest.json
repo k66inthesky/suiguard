@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "SUI Guard",
-  "version": "0.0",
-  "description": "檢測SUI區塊鏈地址是否在官方黑名單中，並允許用戶回報可疑地址",
+  "version": "0.0.0.1",
+  "description": "Check if a SUI blockchain address is on the official blocklist and allow users to report suspicious addresses.",
   "permissions": ["activeTab", "storage"],
   "host_permissions": ["https://raw.githubusercontent.com/*"],
   "action": {
