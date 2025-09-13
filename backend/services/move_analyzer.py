@@ -2,6 +2,7 @@ import aiohttp
 import re
 from typing import Dict, List, Optional
 import json
+import os
 
 class MoveCodeAnalyzer:
     """Move 程式碼分析器
@@ -11,7 +12,12 @@ class MoveCodeAnalyzer:
     """
     
     def __init__(self):
-        self.rpc_url = "https://fullnode.mainnet.sui.io:443"
+        # 優先使用 SUI_RPC_PROVIDER_URL，然後是 SUI_RPC_PUBLIC_URL
+        self.rpc_url = (
+            os.getenv("SUI_RPC_PROVIDER_URL") or 
+            os.getenv("SUI_RPC_PUBLIC_URL") or 
+            "https://fullnode.mainnet.sui.io:443"
+        )
         
         # 危險函數清單
         self.dangerous_functions = [
