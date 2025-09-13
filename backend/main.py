@@ -46,7 +46,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        os.getenv("CHROME_EXTENSION_ID")  # 🔒 替換為實際的Extension ID
+        f"chrome-extension://{os.getenv('CHROME_EXTENSION_ID')}" # 🔒 替換為實際的Extension ID
     ],
     allow_credentials=False,  # 🔒 生產環境不允許攜帶認證信息
     allow_methods=["GET", "POST"],  # 🔒 只允許必要的HTTP方法
