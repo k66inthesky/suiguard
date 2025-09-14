@@ -1,0 +1,6 @@
+@import "@extension/ui/global.css";
+
+body {
+  width: 380px;
+  height: 600%;
+}
