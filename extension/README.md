@@ -20,7 +20,8 @@ A chrome Extension to protect your Sui Wallet.
 
 - **Node.js** v22.12+
 - **TypeScript** v5+
-- **npm** v9+
+- **pnpm** v9+
+- **turborepo**
 
 ---
 
@@ -53,6 +54,12 @@ pnpm build
 2. Enable "Developer mode" toggle in the upper right side
 3. Click "Load unpacked" in the upper left corner
 4. Select the extension/dist directory from suiguard project
+
+### Start dev server
+
+```bash
+pnpm dev
+```
 
 ## 📜 Licenses
 
