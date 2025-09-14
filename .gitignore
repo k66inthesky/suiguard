@@ -1,8 +1,33 @@
+# dependencies
+**/node_modules
 node_modules
 dist
-.DS_Store
 *.log
 *.tsbuildinfo
 *.js.map
 *.d.ts
 *.env
+.turbo
+
+# testing
+**/coverage
+
+# build
+**/dist
+**/build
+**/dist-zip
+chrome-extension/manifest.js
+chrome-extension/pre-build.tsconfig.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# env
+**/.env.*
+**/.env
+
+# etc
+.DS_Store
+.idea
+**/.turbo
+
+# compiled
+**/tailwind-output.css
