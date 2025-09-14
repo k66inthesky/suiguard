@@ -34,6 +34,7 @@ const manifest = {
     "https://raw.githubusercontent.com/*",
     "https://forms.gle/*",
     "https://suiguard-385906975905.asia-east1.run.app/*",
+    "http://localhost:8000/*",
   ],
   permissions: ["storage", "scripting", "tabs", "notifications", "activeTab"],
   action: {
