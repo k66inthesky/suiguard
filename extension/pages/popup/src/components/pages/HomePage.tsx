@@ -6,6 +6,7 @@ import {
   LockClosedIcon,
   MagnifyingGlassCircleIcon,
 } from "@heroicons/react/24/outline";
+import { Page } from "@src/type";
 import Footer from "../Footer";
 import FunctionCard from "../FunctionCard";
 import Logo from "../Logo";

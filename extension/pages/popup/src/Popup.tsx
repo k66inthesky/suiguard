@@ -7,6 +7,7 @@ import HomePage from "./components/pages/HomePage";
 import PackageCheckPage from "./components/pages/PackageCheckPage";
 import SafeWebsitePage from "./components/pages/SafeWebsitePage";
 import VerifiedPage from "./components/pages/VerifiedPage";
+import { Page } from "./type";
 
 const Popup = () => {
   const [currentPage, setCurrentPage] = useState<Page>("home");
