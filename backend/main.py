@@ -286,9 +286,9 @@ async def internal_error_handler(request, exc):
 if __name__ == "__main__":
     import uvicorn
     
-    # 生產環境默認配置
-    port = int(os.getenv("PORT", 8000))
-    host = os.getenv("HOST", "0.0.0.0")
+    # 生產環境默認配置 - Cloud Run 使用 PORT 環境變數
+    port = int(os.getenv("PORT", 8080))
+    host = "0.0.0.0"  # Cloud Run 需要監聽所有介面
     
     # 設置必要的環境變數
     # 優先使用 SUI_RPC_PROVIDER_URL，然後是 SUI_RPC_PUBLIC_URL，最後是默認值

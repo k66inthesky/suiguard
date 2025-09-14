@@ -1,0 +1,17 @@
+# 忽略不需要的文件
+.env
+.env.*
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+venv/
+.venv/
+.git/
+.gitignore
+*.log
+.DS_Store
+Thumbs.db
+README.md

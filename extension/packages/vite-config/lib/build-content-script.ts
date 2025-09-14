@@ -1,7 +1,9 @@
 import { withPageConfig } from './index.js';
 import { IS_DEV } from '@extension/env';
 import { makeEntryPointPlugin } from '@extension/hmr';
-import { build as buildTW } from 'tailwindcss/lib/cli/build';
+// Fix: Use postcss CLI instead of internal tailwindcss API
+import { exec } from 'node:child_process';
+import { promisify } from 'node:util';
 import { build } from 'vite';
 import { readdirSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -60,18 +62,23 @@ const configsBuilder = ({ matchesDir, srcDir, rootDir, contentName }: BuilderPro
     }),
   }));
 
+const execAsync = promisify(exec);
+
 const builds = async ({ srcDir, contentName, rootDir, matchesDir, withTw }: IContentBuilderProps) =>
   configsBuilder({ matchesDir, srcDir, rootDir, contentName }).map(async ({ name, config }) => {
     if (withTw) {
       const folder = resolve(matchesDir, name);
-      const args = {
-        ['--input']: resolve(folder, 'index.css'),
-        ['--output']: resolve(rootDir, 'dist', name, 'index.css'),
-        ['--config']: resolve(rootDir, 'tailwind.config.ts'),
-        ['--watch']: IS_DEV,
-      };
-
-      await buildTW(args);
+      const inputPath = resolve(folder, 'index.css');
+      const outputPath = resolve(rootDir, 'dist', name, 'index.css');
+      const configPath = resolve(rootDir, 'tailwind.config.ts');
+      
+      try {
+        // Use tailwindcss CLI instead of internal API
+        const cmd = `npx tailwindcss -i ${inputPath} -o ${outputPath} -c ${configPath}${IS_DEV ? ' --watch' : ''}`;
+        await execAsync(cmd);
+      } catch (error) {
+        console.warn(`TailwindCSS build failed for ${name}:`, error);
+      }
     }
 
     //@ts-expect-error This is hidden property from vite's resolveConfig()
