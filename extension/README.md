@@ -1,8 +1,9 @@
 # 🚀 SuiGuard Chrome Extension
 
-[![License](https://img.shields.io/github/license/k66inthesky/suiguard)](./LICENSE)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/yourname/yourrepo/ci.yml)](https://github.com/yourname/yourrepo/actions)
-[![npm version](https://img.shields.io/npm/v/your-package)](https://www.npmjs.com/package/your-package)
+[![License](https://img.shields.io/github/license/k66inthesky/suiguard/extension)](./LICENSE)
+
+<!-- [![Build Status](https://img.shields.io/github/actions/workflow/status/yourname/yourrepo/ci.yml)](https://github.com/yourname/yourrepo/actions)
+[![npm version](https://img.shields.io/npm/v/your-package)](https://www.npmjs.com/package/your-package) -->
 
 A chrome Extension to protect your Sui Wallet.
 
@@ -25,13 +26,6 @@ A chrome Extension to protect your Sui Wallet.
 
 ---
 
-<!-- ## ✨ 功能特色 (Features)
-- 🔹 功能 A
-- 🔹 功能 B
-- 🔹 功能 C
-
---- -->
-
 ## 📖 Quick Start
 
 ### Prerequisites
@@ -53,7 +47,7 @@ pnpm build
 1. Open chrome://extensions in Chrome
 2. Enable "Developer mode" toggle in the upper right side
 3. Click "Load unpacked" in the upper left corner
-4. Select the extension/dist directory from suiguard project
+4. Select the `extension/dist` directory from suiguard project
 
 ### Start dev server
 
@@ -70,3 +64,9 @@ This project includes code from [chrome-extension-boilerplate-react-vite](https:
 ## 🙏 Acknowledgements
 
 This project is built upon [chrome-extension-boilerplate-react-vite](https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite/tree/main?tab=readme-ov-file#community).
+
+## ✨ WIP
+
+- Sep 14 2025: upgrade tailwindCSS from V3 to V4 using pnpm audit, popup already solved build error, other archived modules haven't.
+
+---
