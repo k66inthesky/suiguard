@@ -5,7 +5,7 @@ export default function ComparisonCard({
   pkgId,
   pkgTime,
 }: {
-  version: number;
+  version?: number;
   pkgId?: string;
   pkgTime?: string;
 }) {
@@ -29,7 +29,7 @@ export default function ComparisonCard({
 
       <button
         onClick={() =>
-          window.open(`https://suivision.xyz/package/${package_id}`, "_blank")
+          window.open(`https://suivision.xyz/package/${pkgId ?? ""}`, "_blank")
         }
         className="w-full mt-4 flex items-center justify-center gap-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
       >
