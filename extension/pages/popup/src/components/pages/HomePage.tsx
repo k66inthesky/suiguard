@@ -9,16 +9,16 @@ import {
 import { Page } from "@src/type";
 import Footer from "../Footer";
 import FunctionCard from "../FunctionCard";
-import Logo from "../Logo";
+import Header from "../Header";
 
 export default function HomePage({
   handlePageChange,
 }: {
-  handlePageChange: (page: Page) => void;
+  readonly handlePageChange: (page: Page) => void;
 }) {
   return (
     <div className="space-y-6">
-      <Logo />
+      <Header />
 
       <div className="bg-gradient-to-r from-blue-50 to-teal-50 p-4 rounded-xl border border-blue-100">
         <div className="flex items-center gap-3">

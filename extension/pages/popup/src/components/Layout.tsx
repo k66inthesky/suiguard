@@ -1,5 +1,6 @@
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
 import Footer from "./Footer";
+import { Page } from "@src/type";
 
 export default function Layout({
   title,
