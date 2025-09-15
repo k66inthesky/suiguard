@@ -32,7 +32,7 @@ const Popup = () => {
     }
   };
 
-  return <div className=" bg-gray-50 p-6 font-sans ">{renderPage()}</div>;
+  return <div className=" bg-gray-50 p-6 font-sans">{renderPage()}</div>;
 };
 
 export default withErrorBoundary(
