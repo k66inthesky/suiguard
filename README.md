@@ -8,7 +8,7 @@
 
 Real-time Security Extension for SUI UsersSuiGuard got 3rd place at 2025 Sui Taipei Dev Hackathon
 
-https://github.com/user-attachments/assets/730de456-5851-405e-80a8-20d0d8030459
+https://github.com/user-attachments/assets/e86bb764-5eee-476c-a666-227a94ca7108
 
 ---
 
