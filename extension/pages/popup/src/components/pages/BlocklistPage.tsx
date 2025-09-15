@@ -326,7 +326,10 @@ export default function BlocklistPage({
         {searchResult && (
           <div className="mt-4 p-4 rounded-xl border-2 bg-gray-50">
             <h3 className="font-medium text-gray-800 mb-2">檢測結果：</h3>
-            <pre className="whitespace-pre-wrap text-sm text-gray-700 font-mono">
+            <pre
+              className="whitespace-pre-wrap text-sm text-gray-700 font-mono overflow-auto break-words"
+              style={{ maxHeight: 240, wordBreak: "break-all" }}
+            >
               {searchResult}
             </pre>
           </div>
