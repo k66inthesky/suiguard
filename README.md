@@ -4,11 +4,22 @@
 
 # SUI Guard
 
-🛡️ 一個專為 SUI 區塊鏈生態系統設計的安全防護 Chrome 擴展
+🛡️ 一個專為 SUI 區塊鏈生態系統設計的即時安全防護 Chrome 擴展
 
-https://github.com/user-attachments/assets/730de456-5851-405e-80a8-20d0d8030459
+Real-time Security Extension for SUI UsersSuiGuard got 3rd place at 2025 Sui Taipei Dev Hackathon
+
+https://github.com/user-attachments/assets/e86bb764-5eee-476c-a666-227a94ca7108
 
 ---
+
+## 🏆 Awards
+
+- 🥉 2025 Sui Taipei Dev Hackathon - 3rd Place
+
+## 🚀 Join us! 初衷 & 誠摯邀請你加入
+
+- web3 被盜事件太多，想做公益項目造福大家。
+  > 即使是相對安全的 Sui，其生態系的協議也在不斷受到威脅。例如 2025 年 5 月 Cetus 被盜$0.22B、9 月 nemo protocol 被盜$3M。故我們 SuiGuard 團隊期待與您一起做出更助人的 web3 防禦工具！
 
 ## Meeting Notes 會議紀要
 
@@ -20,13 +31,9 @@ https://github.com/user-attachments/assets/730de456-5851-405e-80a8-20d0d8030459
 - Sep. 12, 2025 - Implement AI risk-assessment analyzer
 - Sep. 13, 2025 - Deploy to GCP, deploy to SUI testnet
 - Sep. 14, 2025 - SUI Taipei Demo Day
+- Sep. 15, 2025 - Update Pitch Deck
 
 ---
-
-### Goal & Welcome to join us! 初衷 & 誠摯邀請你加入
-
-- web3 被盜事件太多，想做公益項目造福大家。
-  > 即使是相對安全的 Sui，其生態系的協議也在不斷受到威脅。例如 2025 年 5 月 Cetus 被盜$0.22B、9 月 nemo protocol 被盜$3M。故我們 SuiGuard 團隊期待與您一起做出更助人的 web3 防禦工具！
 
 ## Features 功能特色
 
@@ -39,30 +46,21 @@ https://github.com/user-attachments/assets/730de456-5851-405e-80a8-20d0d8030459
    - Security badge - 讓用戶在瀏覽器上看到網站的安全徽章
 3. Real-time webhook notification - 鏈上有大事時即時通知企業用戶(像是 SUI 生態系的 protocols, wallet, DeFi, NFT marketplace, Memecoins 等項目方)
 
-## Real-Time Blacklist 初版資料來源
+4. Real-Time Blocklist 初版資料來源
 
-> 目前正在與 MystenLabs 聯繫，爭取成為官方合作夥伴，取得更即時的黑名單資料，同時也希望能將我們 SuiGuard 用戶提交的黑名單反饋給 MystenLabs。
+   > 目前正在與 MystenLabs 聯繫，爭取成為官方合作夥伴，取得更即時的黑名單資料，同時也希望能將我們 SuiGuard 用戶提交的黑名單反饋給 MystenLabs。
+   > 黑名單數據來源於 [MystenLabs 官方黑名單倉庫](https://github.com/MystenLabs/wallet_blocklist)
 
-黑名單數據來源於 [MystenLabs 官方黑名單倉庫](https://github.com/MystenLabs/wallet_blocklist)：
-
-- coin-list.json
-- object-list.json
-- domain-list.json
-- package-list.json
+   - coin-list.json
+   - object-list.json
+   - domain-list.json
+   - package-list.json
 
 預期將用戶提交的黑名單：我們自己 own 一個，也分享回報給[MystenLabs](https://github.com/MystenLabs/wallet_blocklist)或[suiet](https://github.com/suiet/guardians)。
 
 ## 安裝方式
 
-See Extension/Readme.md
-
-## 技術棧
-
-- **前端**: HTML5, CSS3, JavaScript (ES6+)
-- **API**: GitHub Raw API
-- **存儲**: Chrome Storage API
-- **架構**: Chrome Extension Manifest V3
-- **後端**: Python3.12 FastAPI, Jest, React Testing Library
+See `extension/Readme.md`&`backend/Readme.md`
 
 ## 貢獻指南
 
@@ -86,6 +84,11 @@ See Extension/Readme.md
 
 ## Team Member 團隊成員
 
+<a href="https://github.com/k66inthesky/suiguard/graphs/contributors">
+  <img width="100px" src="https://contrib.rocks/image?repo=k66inthesky/suiguard" alt="All Contributors"/>
+</a>
+
+<br />
 👨‍💻 [k66](https://github.com/k66inthesky) - Backend, ML, CI/CD, System Design
 
 👨‍💻 [Emily](https://github.com/lienweb) - Frontend, UI/UX, System Design
