@@ -5,7 +5,7 @@ A production-ready FastAPI backend for Sui wallet security analysis with DeepSee
 ## Features
 
 - **Smart Contract Analysis**: Move code vulnerability detection
-- **ML Integration**: DeepSeek-R1 powered classification  
+- **ML Integration**: DeepSeek-R1 powered classification
 - **Risk Scoring**: 100-point probability-based risk assessment
 - **Package Versioning**: Smart contract version tracking
 - **Chrome Extension**: Ready for browser extension integration
@@ -13,22 +13,26 @@ A production-ready FastAPI backend for Sui wallet security analysis with DeepSee
 ## Quick Start
 
 1. Copy environment file:
+
 ```bash
 cp .env.example .env
 ```
 
 2. Configure your API keys in `.env`:
+
 ```
 DEEPSEEK_API_KEY=your_deepseek_api_key
 SUI_RPC_PROVIDER_URL=your_sui_rpc_endpoint
 ```
 
 3. Install dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
 
 4. Run server:
+
 ```bash
 python main.py
 ```
@@ -36,6 +40,7 @@ python main.py
 ## API Endpoints
 
 ### Analyze Connection
+
 ```http
 POST /api/analyze-connection
 Content-Type: application/json
@@ -46,6 +51,7 @@ Content-Type: application/json
 ```
 
 ### Analyze Package Versions
+
 ```http
 POST /api/analyze-versions
 Content-Type: application/json
@@ -60,18 +66,20 @@ Content-Type: application/json
 The system uses DeepSeek-R1 to classify Move smart contracts into:
 
 - `access_control` (80-100 points) - Permission vulnerabilities
-- `logic_error` (50-79 points) - Logic flaws  
+- `logic_error` (50-79 points) - Logic flaws
 - `randomness_error` (20-49 points) - Randomness issues
 - `safe` (0-19 points) - No vulnerabilities detected
 
 ## Risk Assessment
 
 Final risk scores combine:
+
 - ML classification (60% weight when confident)
 - Rule-based analysis (40% weight when ML confident)
 - Confidence adjustments based on ML certainty
 
 Risk levels:
+
 - **HIGH** (≥70): Reject connection
 - **MEDIUM** (40-69): Show warning
 - **LOW** (<40): Approve connection
@@ -108,4 +116,5 @@ GET /health
 Returns service status and configuration validation.
 
 ---
-*by SuiGuard Team*
+
+_by SuiGuard Team_
