@@ -32,6 +32,7 @@ https://github.com/user-attachments/assets/e86bb764-5eee-476c-a666-227a94ca7108
 - Sep. 13, 2025 - Deploy to GCP, deploy to SUI testnet
 - Sep. 14, 2025 - SUI Taipei Demo Day
 - Sep. 15, 2025 - Update Pitch Deck
+- Sep. 22, 2025 - Do ML research
 
 ---
 
