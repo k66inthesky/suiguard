@@ -104,7 +104,9 @@ See `extension/Readme.md`&`backend/Readme.md`
 + Core team member與contributor有何不同?
   + Core team member為整個SuiGaurd專案中貢獻最多的人。 
   + 前者一定兼任後者，後者不一定是前者。
-  
+
+## 下次月會時間
+> 有興趣成為`SuiGuard Core Team Member`者請務必關注此日期。
 
 ## 授權條款
 
