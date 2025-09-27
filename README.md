@@ -85,16 +85,26 @@ See `extension/Readme.md`&`backend/Readme.md`
 - 使用 Issue 模板提供詳細資訊
 - 歡迎讓我知道你對防呆/防亂設計的想法！
 
-## Team Member 團隊成員
+## Core Team Member 核心團隊成員
 
-<a href="https://github.com/k66inthesky/suiguard/graphs/contributors">
-  <img width="100px" src="https://contrib.rocks/image?repo=k66inthesky/suiguard" alt="All Contributors"/>
-</a>
-
-<br />
 👨‍💻 [k66](https://github.com/k66inthesky) - Backend, ML, CI/CD, System Design
 
 👨‍💻 [Emily](https://github.com/lienweb) - Frontend, UI/UX, System Design
+
+
+## How to join Core Team Member? 如何加入核心團隊成員?
+請依以下順序:
+1. 先確認下次月會時間，你可否到場。
+2. 填表單(https://forms.gle/oE3AUChoMqkhruD79)，約費時22分鐘。
+3. 開issue，tag選`join core team`，標題寫[Join Core Team]，並留下你填表單的email，我們將寄信聯繫你。
+4. 再正式成為core team member前會先稱呼為core team candidate。
+5. core team candidate需和整個core team一起工作一個月，期間須完成指定工作、每次準時交付程式碼。
+6. 一個月後，每個月月會上，會公布晉升成為core team member的人員名單。
+
++ Core team member與contributor有何不同?
+  + Core team member為整個SuiGaurd專案中貢獻最多的人。 
+  + 前者一定兼任後者，後者不一定是前者。
+  
 
 ## 授權條款
 
