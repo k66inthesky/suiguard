@@ -35,6 +35,7 @@ https://github.com/user-attachments/assets/e86bb764-5eee-476c-a666-227a94ca7108
 - Sep. 22, 2025 - Do ML research
 - Sep. 26, 2025 - Design detail ML roadmap
 - Sep. 27, 2025 - Design core team member recruit  SOP
+- Sep. 28, 2025 - Interview core team candidates. Introduce & assign tasks. 
 
 ---
 
