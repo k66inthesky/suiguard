@@ -1,6 +1,6 @@
 # 🚀 SuiGuard Chrome Extension
 
-[![License](https://img.shields.io/github/license/k66inthesky/suiguard/extension)](./LICENSE)
+<!-- [![License](https://img.shields.io/github/license/k66inthesky/suiguard/extension)](./LICENSE) -->
 
 <!-- [![Build Status](https://img.shields.io/github/actions/workflow/status/yourname/yourrepo/ci.yml)](https://github.com/yourname/yourrepo/actions)
 [![npm version](https://img.shields.io/npm/v/your-package)](https://www.npmjs.com/package/your-package) -->
