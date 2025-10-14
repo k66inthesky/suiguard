@@ -4,6 +4,10 @@ from datetime import datetime
 import json
 import aiohttp
 import os
+from peft import LoraConfig, get_peft_model
+from transformers import AutoModelForCausalLM, AutoTokenizer
+from sklearn.metrics import f1_score
+import torch
 
 class RiskEngine:
     """風險評估引擎 - 
@@ -12,9 +16,15 @@ class RiskEngine:
     """
     
     def __init__(self):
-        # DeepSeek-R1 API 配置
-        self.deepseek_api_key = os.getenv("DEEPSEEK_API_KEY")
-        self.deepseek_endpoint = "https://api.deepseek.com/v1/chat/completions"
+        # LoRA 微調模型配置
+        self.model_path = os.getenv("LORA_MODEL_PATH", "./lora_models")
+        self.base_model_name = os.getenv("BASE_MODEL_NAME", "mistralai/Mistral-7B-v0.1")
+        self.dataset_path = os.getenv("DATASET_PATH", "ml/contract_bug_dataset.jsonl")
+        
+        # 初始化模型和分詞器
+        self.model = None
+        self.tokenizer = None
+        self._initialize_model()
         
         # 漏洞分類映射到風險分數區間 (100分制)
         self.vulnerability_score_ranges = {
@@ -69,6 +79,127 @@ class RiskEngine:
             "0x0000000000000000000000000000000000000000000000000000000000000002",  # Sui framework
             "0x0000000000000000000000000000000000000000000000000000000000000003"   # Sui system
         }
+    
+    def _initialize_model(self):
+        """初始化 LoRA 微調模型"""
+        try:
+            print(f"🔄 正在加載基礎模型: {self.base_model_name}")
+            
+            # 加載 tokenizer
+            self.tokenizer = AutoTokenizer.from_pretrained(self.base_model_name)
+            
+            # 加載基礎模型
+            base_model = AutoModelForCausalLM.from_pretrained(
+                self.base_model_name,
+                torch_dtype=torch.float16,
+                device_map="auto"
+            )
+            
+            # 配置 LoRA
+            lora_config = LoraConfig(
+                r=8,
+                lora_alpha=16,
+                target_modules=["q_proj", "v_proj"],
+                lora_dropout=0.05,
+                bias="none",
+                task_type="CAUSAL_LM"
+            )
+            
+            # 應用 LoRA
+            self.model = get_peft_model(base_model, lora_config)
+            
+            # 如果存在已訓練的模型，加載權重
+            if os.path.exists(self.model_path):
+                print(f"✅ 加載微調權重: {self.model_path}")
+                self.model.load_adapter(self.model_path)
+            else:
+                print(f"⚠️ 未找到微調模型，使用基礎模型: {self.model_path}")
+            
+            self.model.eval()
+            print("✅ 模型加載完成")
+            
+        except Exception as e:
+            print(f"❌ 模型加載失敗: {e}")
+            self.model = None
+            self.tokenizer = None
+    
+    def load_dataset(self, jsonl_path: str) -> List[Dict]:
+        """加載訓練數據集"""
+        lines = []
+        try:
+            with open(jsonl_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    obj = json.loads(line)
+                    lines.append({
+                        "prompt": f"{obj['instruction']}\n{obj['input']}",
+                        "output": obj['output']
+                    })
+            print(f"✅ 成功加載 {len(lines)} 筆訓練數據")
+        except Exception as e:
+            print(f"❌ 數據集加載失敗: {e}")
+        return lines
+    
+    def extract_label(self, output_text: str) -> str:
+        """從輸出文本提取漏洞標籤"""
+        output_lower = output_text.lower()
+        
+        if "未發現明顯漏洞" in output_text or "未發現漏洞" in output_text:
+            return "safe"
+        elif "重入攻擊" in output_text or "reentrancy" in output_lower:
+            return "reentrancy"
+        elif "溢位" in output_text or "overflow" in output_lower:
+            return "overflow"
+        elif "存取控制" in output_text or "access_control" in output_lower:
+            return "access_control"
+        elif "邏輯錯誤" in output_text or "logic_error" in output_lower:
+            return "logic_error"
+        elif "隨機數" in output_text or "randomness" in output_lower:
+            return "randomness_error"
+        else:
+            return "other_bug"
+    
+    def calculate_f1_score(self, dataset: List[Dict]) -> float:
+        """計算模型的 F1 分數"""
+        if not self.model or not self.tokenizer:
+            print("❌ 模型未初始化，無法計算 F1 分數")
+            return 0.0
+        
+        y_true = []
+        y_pred = []
+        
+        print(f"📊 開始評估 {len(dataset)} 筆數據...")
+        
+        for i, sample in enumerate(dataset):
+            if i % 10 == 0:
+                print(f"  處理進度: {i}/{len(dataset)}")
+            
+            prompt = sample['prompt']
+            label_true = self.extract_label(sample['output'])
+            
+            # 生成預測
+            input_ids = self.tokenizer(prompt, return_tensors="pt", max_length=1024, truncation=True).input_ids
+            if torch.cuda.is_available():
+                input_ids = input_ids.to('cuda')
+            
+            with torch.no_grad():
+                output_ids = self.model.generate(
+                    input_ids=input_ids,
+                    max_new_tokens=128,
+                    temperature=0.7,
+                    do_sample=True,
+                    pad_token_id=self.tokenizer.eos_token_id
+                )
+            
+            output_text = self.tokenizer.decode(output_ids[0], skip_special_tokens=True)
+            label_pred = self.extract_label(output_text)
+            
+            y_true.append(label_true)
+            y_pred.append(label_pred)
+        
+        # 計算 F1 分數
+        f1 = f1_score(y_true, y_pred, average='macro')
+        print(f"✅ F1 分數（macro）: {f1:.4f}")
+        return f1
     
     def analyze_domain_risk(self, domain: str) -> Dict:
         """分析域名風險"""
@@ -261,117 +392,121 @@ class RiskEngine:
 
     async def classify_smart_contract_vulnerability(self, move_code: str) -> Dict:
         """
-        使用 DeepSeek-R1 對 Move 智能合約代碼進行漏洞分類
-        分類為：access_control, logic_error, randomness_error, safe
+        使用 LoRA 微調的 Llama-2 模型對 Move 智能合約代碼進行漏洞分類
+        分類為：reentrancy, overflow, access_control, logic_error, randomness_error, safe
         """
         try:
-            if not self.deepseek_api_key:
+            if not self.model or not self.tokenizer:
                 return {
                     "classification": "safe",
                     "confidence": 0.0,
-                    "reasoning": "DeepSeek API key not configured",
-                    "error": "API key missing"
+                    "reasoning": "模型未初始化",
+                    "error": "Model not initialized"
                 }
             
-            # 構建分類提示詞 - 要求機率分布輸出
-            prompt = f"""請分析以下 Move 智能合約代碼，判斷其安全漏洞類型。
-
-漏洞分類定義：
-1. access_control - 存取控制漏洞（權限檢查不當、未授權操作等）
-2. logic_error - 邏輯錯誤漏洞（計算錯誤、狀態管理問題等）  
-3. randomness_error - 隨機數漏洞（可預測隨機數、偽隨機數等）
-
-請以 JSON 格式回答，包含：
-- classification: 最可能的分類 (access_control/logic_error/randomness_error/safe)
-- probabilities: 各類別機率分布
-  - access_control: 0.0-1.0
-  - logic_error: 0.0-1.0  
-  - randomness_error: 0.0-1.0
-  - safe: 0.0-1.0
-- max_probability: 最高機率值 (0.0-1.0)
-- reasoning: 詳細分析原因
-
-注意：四個機率總和應接近1.0
-
-Move 代碼：
-```move
-{move_code}
-```
-
-請僅回答 JSON 格式。"""
-
-            # 調用 DeepSeek API
-            headers = {
-                "Authorization": f"Bearer {self.deepseek_api_key}",
-                "Content-Type": "application/json"
+            # 構建提示詞
+            instruction = "請找出Sui smart contract的惡意漏洞，並判斷危險等級"
+            prompt = f"{instruction}\n{move_code}"
+            
+            # 分詞
+            input_ids = self.tokenizer(
+                prompt,
+                return_tensors="pt",
+                max_length=1024,
+                truncation=True
+            ).input_ids
+            
+            # 移至 GPU（如果可用）
+            if torch.cuda.is_available():
+                input_ids = input_ids.to('cuda')
+            
+            # 生成預測
+            with torch.no_grad():
+                output_ids = self.model.generate(
+                    input_ids=input_ids,
+                    max_new_tokens=128,
+                    temperature=0.7,
+                    do_sample=True,
+                    pad_token_id=self.tokenizer.eos_token_id
+                )
+            
+            # 解碼輸出
+            output_text = self.tokenizer.decode(output_ids[0], skip_special_tokens=True)
+            
+            # 提取分類標籤
+            classification = self.extract_label(output_text)
+            
+            # 解析危險等級
+            confidence = 0.5  # 默認信心度
+            if "危險等級：高" in output_text or "高風險" in output_text:
+                confidence = 0.9
+                risk_level = "HIGH"
+            elif "危險等級：中" in output_text or "中風險" in output_text:
+                confidence = 0.6
+                risk_level = "MEDIUM"
+            elif "危險等級：低" in output_text or "低風險" in output_text:
+                confidence = 0.3
+                risk_level = "LOW"
+            else:
+                risk_level = "UNKNOWN"
+            
+            # 映射到標準分類
+            classification_map = {
+                "reentrancy": "access_control",
+                "overflow": "logic_error",
+                "access_control": "access_control",
+                "logic_error": "logic_error",
+                "randomness_error": "randomness_error",
+                "safe": "safe",
+                "other_bug": "logic_error"
             }
             
-            payload = {
-                "model": "deepseek-reasoner",
-                "messages": [
-                    {
-                        "role": "user", 
-                        "content": prompt
-                    }
-                ],
-                "temperature": 0.1,
-                "max_tokens": 1000
+            standard_classification = classification_map.get(classification, "safe")
+            
+            # 構建概率分布
+            probabilities = {
+                "access_control": 0.0,
+                "logic_error": 0.0,
+                "randomness_error": 0.0,
+                "safe": 0.0
             }
             
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    self.deepseek_endpoint, 
-                    headers=headers, 
-                    json=payload,
-                    timeout=aiohttp.ClientTimeout(total=30)
-                ) as response:
-                    if response.status == 200:
-                        result = await response.json()
-                        content = result["choices"][0]["message"]["content"]
-                        
-                        # 解析 JSON 回應
-                        try:
-                            classification_result = json.loads(content)
-                            
-                            # 驗證新的回應格式
-                            required_fields = ["classification", "probabilities", "max_probability", "reasoning"]
-                            if all(field in classification_result for field in required_fields):
-                                # 計算基於機率的風險分數
-                                risk_score = self._calculate_probability_based_risk_score(classification_result)
-                                classification_result["risk_score"] = risk_score
-                                return classification_result
-                            else:
-                                return {
-                                    "classification": "safe",
-                                    "probabilities": {"access_control": 0.0, "logic_error": 0.0, "randomness_error": 0.0, "safe": 1.0},
-                                    "max_probability": 1.0,
-                                    "risk_score": 0,
-                                    "reasoning": f"Invalid response format from DeepSeek: {content}",
-                                    "error": "Invalid response format"
-                                }
-                                
-                        except json.JSONDecodeError:
-                            return {
-                                "classification": "safe",
-                                "probabilities": {"access_control": 0.0, "logic_error": 0.0, "randomness_error": 0.0, "safe": 1.0},
-                                "max_probability": 1.0,
-                                "risk_score": 0,
-                                "reasoning": f"Failed to parse DeepSeek response: {content}",
-                                "error": "JSON parse error"
-                            }
-                    else:
-                        error_text = await response.text()
-                        return {
-                            "classification": "safe", 
-                            "confidence": 0.0,
-                            "reasoning": f"DeepSeek API error: {response.status} - {error_text}",
-                            "error": f"API error {response.status}"
-                        }
+            # 根據分類設置概率
+            if standard_classification in probabilities:
+                probabilities[standard_classification] = confidence
+                # 分配剩餘概率給其他類別
+                remaining_prob = 1.0 - confidence
+                other_count = len(probabilities) - 1
+                for key in probabilities:
+                    if key != standard_classification:
+                        probabilities[key] = remaining_prob / other_count
+            else:
+                probabilities["safe"] = 1.0
+            
+            # 計算風險分數
+            classification_result = {
+                "classification": standard_classification,
+                "probabilities": probabilities,
+                "max_probability": confidence,
+                "reasoning": output_text,
+                "original_classification": classification,
+                "risk_level": risk_level
+            }
+            
+            risk_score = self._calculate_probability_based_risk_score(classification_result)
+            classification_result["risk_score"] = risk_score
+            
+            return classification_result
                         
         except Exception as e:
             return {
                 "classification": "safe",
-                "probabilities": {"access_control": 0.0, "logic_error": 0.0, "randomness_error": 0.0, "safe": 1.0},
+                "probabilities": {
+                    "access_control": 0.0,
+                    "logic_error": 0.0,
+                    "randomness_error": 0.0,
+                    "safe": 1.0
+                },
                 "max_probability": 1.0,
                 "risk_score": 0,
                 "reasoning": f"ML classification failed: {str(e)}",
