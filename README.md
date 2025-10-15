@@ -39,6 +39,7 @@ https://github.com/user-attachments/assets/e86bb764-5eee-476c-a666-227a94ca7108
 - Sep. 30, 2025 - Implement ML Phase 1 and Phase 2
 - Oct. 07, 2025 - Discuss long-term goal
 - Oct. 10, 2025 - Discuss ML code and dateset
+- Oct. 14, 2025 - rebrand and refine core features
 
 ---
 
