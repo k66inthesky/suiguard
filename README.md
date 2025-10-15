@@ -126,9 +126,9 @@ See `extension/Readme.md`&`backend/Readme.md`
   > 例如 09/28 的面試，因遇到 HOH 黑客松，故`candidate`審核期結束設為 10/22。
 - 每個月月末，所有`core team member`需填寫 review 表單，再根據 review 表單結果，決定`candidate`是否成為`member`。
 
-## 授權條款
+## License
 
-MIT License - 詳見 LICENSE 文件
+Apache License 2.0, see [LICENSE](./LICENSE).
 
 ---
 
