@@ -1,31 +1,27 @@
-import { useStorage } from "@extension/shared";
-import { exampleThemeStorage } from "@extension/storage";
 import { cn } from "@/lib/utils";
 import type { ComponentPropsWithoutRef } from "react";
 
 type LogoProps = ComponentPropsWithoutRef<"img"> & {
-  variant?: "vertical" | "horizontal";
-  page?: "popup" | "new-tab" | "options" | "side-panel" | "devtools-panel";
-  size?: number;
+  variant?: "white" | "black";
+  page: "popup" | "new-tab" | "options" | "side-panel" | "devtools-panel";
+  size: 16 | 48 | 128;
 };
 
 export const Logo = ({
   size,
-  page = "popup",
+  page,
   className,
+  variant,
   ...props
 }: LogoProps) => {
-  const { isLight } = useStorage(exampleThemeStorage);
-
-  const getLogoPath = () => {
-    const theme = isLight ? "" : "_dark";
-    return `${page}/logo${size}.png`;
-  };
+  const logoPath = variant
+    ? `${page}/logo${size}_${variant}.png`
+    : `${page}/logo${size}.png`;
 
   return (
     <img
-      src={chrome.runtime.getURL(getLogoPath())}
-      className={cn("App-logo", className)}
+      src={chrome.runtime.getURL(logoPath)}
+      className={className}
       alt="logo"
       {...props}
     />
