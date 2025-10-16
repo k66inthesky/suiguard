@@ -1,6 +1,6 @@
 # 🚀 SuiGuard Chrome Extension
 
-<!-- [![License](https://img.shields.io/github/license/k66inthesky/suiguard/extension)](./LICENSE) -->
+[![License](https://img.shields.io/github/license/k66inthesky/suiguard)](./LICENSE)
 
 <!-- [![Build Status](https://img.shields.io/github/actions/workflow/status/yourname/yourrepo/ci.yml)](https://github.com/yourname/yourrepo/actions)
 [![npm version](https://img.shields.io/npm/v/your-package)](https://www.npmjs.com/package/your-package) -->
@@ -55,11 +55,9 @@ pnpm build
 pnpm dev
 ```
 
-## 📜 Licenses
+## 📜 License
 
-This project is licensed under the MIT License.
-
-This project includes code from [chrome-extension-boilerplate-react-vite](https://github.com/Jonghakseo/chrome-extension-boilerplate-react-vite/tree/main?tab=readme-ov-file#community), licensed under MIT.
+Apache License 2.0, see [LICENSE](https://github.com/k66inthesky/suiguard/blob/main/LICENSE).
 
 ## 🙏 Acknowledgements
 
