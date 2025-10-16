@@ -1,9 +1,9 @@
 import { cn } from "@extension/ui";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { API_URL } from "@src/constants";
+import { API_URL, FEATURES } from "@src/constants";
 import { Page } from "@src/type";
 import { useEffect, useState } from "react";
-import Layout from "../Layout";
+import PageLayout from "../PageLayout";
 import { convertTimestamp } from "@src/utils";
 
 export default function SafeWebsitePage({
@@ -15,15 +15,16 @@ export default function SafeWebsitePage({
     package_ids: string[];
     is_legal: boolean;
     recommendation: string;
-    light?: string; //bg-green-500
+    light?: string;
     timestamp: string;
     confidence: number;
   } | null>(null);
+  const [resultError, setResultError] = useState<boolean>(false);
   const [scan, setScan] = useState<{
     scanning: boolean;
     buttonText: string;
     tabUrl: string;
-  }>({ scanning: false, buttonText: "一鍵搜尋", tabUrl: "" });
+  }>({ scanning: false, buttonText: "Start Scan", tabUrl: "" });
 
   useEffect(() => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -34,7 +35,7 @@ export default function SafeWebsitePage({
   const handleThreatScan = async () => {
     setScan((prev) => ({
       ...prev,
-      buttonText: "Submitting...",
+      buttonText: "Scanning...",
       scanning: true,
     }));
 
@@ -51,8 +52,12 @@ export default function SafeWebsitePage({
           ],
         }),
       });
-      const data = await res.json();
 
+      if (!res.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await res.json();
       const { risk_level, confidence, recommendation, timestamp } = data;
       const notLegal = risk_level === "HIGH" || risk_level === "MEDIUM";
       const { formatted } = convertTimestamp(timestamp);
@@ -67,59 +72,73 @@ export default function SafeWebsitePage({
         recommendation,
         confidence,
       });
-      setScan((prev) => ({ ...prev, buttonText: "一鍵搜尋", scanning: false }));
+      setScan((prev) => ({
+        ...prev,
+        buttonText: "Start Scan",
+        scanning: false,
+      }));
+      setResultError(false);
     } catch (e) {
       console.error("Threat scan failed:", e);
       setResult(null);
-      setScan((prev) => ({ ...prev, buttonText: "一鍵搜尋", scanning: false }));
+      setResultError(true);
+      setScan((prev) => ({
+        ...prev,
+        buttonText: "Start Scan",
+        scanning: false,
+      }));
     } finally {
-      setScan((prev) => ({ ...prev, buttonText: "一鍵搜尋", scanning: false }));
+      setScan((prev) => ({
+        ...prev,
+        buttonText: "Start Scan",
+        scanning: false,
+      }));
     }
   };
 
   return (
-    <Layout title="網站安全性查詢" handlePageChange={handlePageChange}>
+    <PageLayout
+      title={FEATURES.safeWebsite}
+      handlePageChange={handlePageChange}
+    >
       <button
         onClick={handleThreatScan}
         disabled={scan.scanning}
-        className="w-full h-12 bg-gradient-to-br from-blue-800 to-blue-900 rounded-lg flex items-center justify-center text-white mb-3 group-hover:scale-105 transition-transform cursor-pointer"
+        className="mt-4 mb-3 flex h-12 w-full cursor-pointer items-center justify-center rounded-lg bg-gradient-to-br from-blue-800 to-blue-900 text-white transition-transform group-hover:scale-105"
       >
         {scan.scanning ? (
           <>
             <div
               id=""
-              className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"
+              className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"
             ></div>
-            Searching...
+            {scan.buttonText}
           </>
         ) : (
           <>
-            <MagnifyingGlassIcon className="w-5 h-5" />
+            <MagnifyingGlassIcon className="h-5 w-5" />
             {scan.buttonText}
           </>
         )}
       </button>
       {result && (
-        <div className="bg-white p-4 rounded-xl border border-gray-200">
-          <h3 className="font-semibold text-gray-900 mb-3 overflow-x-scroll">
-            Domain URL: {scan.tabUrl}
-          </h3>
-          <p className="text-sm text-gray-600 overflow-clip">
+        <div className="rounded-xl border border-gray-200 bg-white p-4">
+          <p className="overflow-clip text-sm text-gray-600">
             Domain URL: {scan.tabUrl}
           </p>
-          <div className="text-center py-8">
-            <div className="flex items-center justify-between p-3 rounded-lg border">
+          <div className="pt-4 pb-8 text-center">
+            <div className="flex items-center justify-between rounded-lg border p-3">
               {/* TODO: convert from score to light */}
               {result.is_legal ? (
                 <div
                   className={cn(
-                    "w-5 h-5 bg-green-500 rounded-full animate-pulse"
+                    "h-5 w-5 animate-pulse rounded-full bg-green-500",
                   )}
                 ></div>
               ) : (
                 <div
                   className={cn(
-                    "w-5 h-5 bg-red-400 rounded-full animate-pulse"
+                    "h-5 w-5 animate-pulse rounded-full bg-red-400",
                   )}
                 ></div>
               )}
@@ -128,26 +147,31 @@ export default function SafeWebsitePage({
                 {/* <p className="text-sm font-medium">
                   {`風險評分:${result.risk_score}`}
                 </p> */}
-                <p className="text-sm font-medium">{`風險評分:90`}</p>
+                <p className="text-sm font-medium">{`Risk Score:90`}</p>
               </div>
             </div>
             {/*  */}
             {/* <div className="mb-4">{result.recommendation}</div> */}
-            <div className="flex-col justify-baseline">
+            <div className="flex-col items-baseline">
               {/* <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div> */}
-              <p className="text-xs text-muted-foreground mt-1">
-                綠燈：可信任網站，可安全簽署
+              <p className="mt-1 text-xs text-gray-600">
+                Green light：Trusted website, safe to sign
               </p>
-              <p className="text-xs text-muted-foreground">
-                黃燈：中度風險，簽署前請再確認
+              <p className="text-xs text-gray-600">
+                Yellow light：Moderate risk, please confirm before signing
               </p>
-              <p className="text-xs text-muted-foreground">
-                紅燈：高風險網站，不建議簽署
+              <p className="text-xs text-gray-600">
+                Red light：High risk website, not recommended for signing
               </p>
             </div>
           </div>
         </div>
       )}
-    </Layout>
+      {resultError && (
+        <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-center text-sm text-red-600">
+          An error occurred, please try again later
+        </div>
+      )}
+    </PageLayout>
   );
 }
