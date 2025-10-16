@@ -33,7 +33,7 @@ const manifest = {
         "https://suiguard-385906975905.asia-east1.run.app/*",
         "http://localhost:8000/*",
     ],
-    permissions: ["storage", "scripting", "tabs", "notifications", "activeTab"],
+    permissions: ["activeTab"],
     action: {
         default_popup: "popup/index.html",
         default_icon: "logo48.png",

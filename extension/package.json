@@ -1,7 +1,7 @@
 {
-  "name": "sui-guard",
+  "name": "sui-audit",
   "version": "0.0.1",
-  "description": "A chrome Extension to protect your Sui Wallet.",
+  "description": "A Chrome Extension for AI-powered code audit solution",
   "license": "Apache-2.0",
   "private": true,
   "sideEffects": false,
@@ -49,6 +49,7 @@
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.35.0",
     "@tailwindcss/postcss": "^4.1.13",
+    "@tailwindcss/vite": "^4.1.14",
     "@types/chrome": "^0.1.11",
     "@types/eslint-plugin-jsx-a11y": "^6.10.0",
     "@types/node": "^24.3.3",
