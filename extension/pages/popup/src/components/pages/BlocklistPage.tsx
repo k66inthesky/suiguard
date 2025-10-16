@@ -1,8 +1,8 @@
 import { LoadingSpinner } from "@extension/ui";
-import { blocklistUrls } from "@src/constants";
+import { BLOCKLIST_URLS, FEATURES } from "@src/constants";
 import { BlocklistData, Page } from "@src/type";
 import { useEffect, useState } from "react";
-import Layout from "../Layout";
+import PageLayout from "../PageLayout";
 
 const parseBlocklist = (data: any, type: string) => {
   if (data && data.blocklist && Array.isArray(data.blocklist)) {
@@ -143,18 +143,20 @@ export default function BlocklistPage({
     ).value;
 
     if (!addressInput) {
-      setSearchResult("❌ 請輸入要檢測的地址");
+      setSearchResult("❌ Enter valid address");
       return;
     }
 
     if (!addressType) {
-      setSearchResult("❌ 請選擇地址類型");
+      setSearchResult("❌ Please select address type");
       return;
     }
 
     // 檢查黑名單是否已載入
     if (!blocklists || blocklists.totalRecords === 0) {
-      setSearchResult("❌ 黑名單尚未載入或載入失敗，請重新整理擴展");
+      setSearchResult(
+        "❌ Blocklist not loaded or failed to load, please restart the extension",
+      );
       return;
     }
 
@@ -198,7 +200,7 @@ export default function BlocklistPage({
       let resultText = "";
 
       if (blacklistedCount > 0) {
-        resultText += `⚠️ 發現 ${blacklistedCount} 個黑名單地址！\n\n`;
+        resultText += `⚠️ Found ${blacklistedCount} addresses in blocklists!\n\n`;
         results
           .filter((r) => r.isBlacklisted)
           .forEach((r) => {
@@ -206,7 +208,7 @@ export default function BlocklistPage({
           });
 
         if (safeCount > 0) {
-          resultText += `\n✅ ${safeCount} 個地址安全\n`;
+          resultText += `\n✅ ${safeCount} addresses are safe\n`;
           results
             .filter((r) => !r.isBlacklisted)
             .forEach((r) => {
@@ -214,7 +216,7 @@ export default function BlocklistPage({
             });
         }
       } else {
-        resultText = `✅ 所有 ${results.length} 個地址都是安全的！\n\n`;
+        resultText = `✅ All ${results.length} addresses are safe!\n\n`;
         results.forEach((r) => {
           resultText += `✅ ${r.address}\n`;
         });
@@ -223,7 +225,7 @@ export default function BlocklistPage({
       setSearchResult(resultText);
     } catch (error) {
       // console.error("❌ 檢測過程錯誤:", error);
-      setSearchResult("❌ 檢測過程中發生錯誤");
+      setSearchResult("❌ An error occurred during the search");
     } finally {
       setIsSearching(false);
     }
@@ -235,10 +237,10 @@ export default function BlocklistPage({
 
       try {
         const [coinRaw, objectRaw, domainRaw, pkgRaw] = await Promise.all([
-          fetch(blocklistUrls.coin).then((r) => r.json()),
-          fetch(blocklistUrls.object).then((r) => r.json()),
-          fetch(blocklistUrls.domain).then((r) => r.json()),
-          fetch(blocklistUrls.package).then((r) => r.json()),
+          fetch(BLOCKLIST_URLS.coin).then((r) => r.json()),
+          fetch(BLOCKLIST_URLS.object).then((r) => r.json()),
+          fetch(BLOCKLIST_URLS.domain).then((r) => r.json()),
+          fetch(BLOCKLIST_URLS.package).then((r) => r.json()),
         ]);
         const coin = parseBlocklist(coinRaw, "coin");
         const object = parseBlocklist(objectRaw, "object");
@@ -273,21 +275,21 @@ export default function BlocklistPage({
   }
 
   return (
-    <Layout title="黑名單檢測" handlePageChange={handlePageChange}>
-      <div className="bg-white p-4 rounded-xl border border-gray-200">
+    <PageLayout title={FEATURES.blocklist} handlePageChange={handlePageChange}>
+      <div className="rounded-xl border border-gray-200 bg-white p-4">
         <div className="space-y-3">
           <div>
             <label
               htmlFor="addressType"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="mb-1 block text-sm font-medium text-gray-700"
             >
-              地址類型
+              Address Type
             </label>
             <select
               id="addressType"
-              className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full rounded-lg border border-gray-200 p-3 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
             >
-              <option value="">選擇類型...</option>
+              <option value="">Choose type...</option>
               <option value="basic">Coin Address</option>
               <option value="deep">Object ID</option>
               <option value="malware">Domain</option>
@@ -297,37 +299,37 @@ export default function BlocklistPage({
           <div>
             <label
               htmlFor="addressInput"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="mb-1 block text-sm font-medium text-gray-700"
             >
-              輸入地址
+              Enter address
             </label>
             <textarea
               id="addressInput"
               placeholder="0x0000000000000000000000000000000000000000000000000000000000000000"
               maxLength={200}
               rows={2}
-              className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm font-mono"
+              className="w-full resize-none rounded-lg border border-gray-200 p-3 font-mono text-sm focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              Github 黑名單成功載入
-              {!!blocklists?.totalRecords ? blocklists.totalRecords : 0}筆
+            <p className="mt-1 text-xs text-gray-500">
+              Blocklist successfully loaded, total records:{" "}
+              {!!blocklists?.totalRecords ? blocklists.totalRecords : 0}
             </p>
           </div>
           <button
-            className="w-full bg-gradient-to-r from-blue-500 to-blue-700 text-white py-3 px-4 rounded-xl font-medium hover:from-blue-600 hover:to-blue-700 transition-all cursor-pointer disabled:opacity-50"
+            className="w-full cursor-pointer rounded-xl bg-gradient-to-r from-blue-500 to-blue-700 px-4 py-3 font-medium text-white transition-all hover:from-blue-600 hover:to-blue-700 disabled:opacity-50"
             onClick={handleSearchClick}
             disabled={isSearching}
           >
-            {isSearching ? "檢測中..." : "🔍 檢測黑名單"}
+            {isSearching ? "Searching..." : "🔍 Search Blocklists"}
           </button>
         </div>
 
         {/* 檢測結果區域 */}
         {searchResult && (
-          <div className="mt-4 p-4 rounded-xl border-2 bg-gray-50">
-            <h3 className="font-medium text-gray-800 mb-2">檢測結果：</h3>
+          <div className="mt-4 rounded-xl border-2 bg-gray-50 p-4">
+            <h3 className="mb-2 font-medium text-gray-800">Search Result:</h3>
             <pre
-              className="whitespace-pre-wrap text-sm text-gray-700 font-mono overflow-auto break-words"
+              className="overflow-auto font-mono text-sm break-words whitespace-pre-wrap text-gray-700"
               style={{ maxHeight: 240, wordBreak: "break-all" }}
             >
               {searchResult}
@@ -335,6 +337,6 @@ export default function BlocklistPage({
           </div>
         )}
       </div>
-    </Layout>
+    </PageLayout>
   );
 }
