@@ -1,8 +1,8 @@
-import { PageItem } from "@src/constants";
+import { FEATURES } from "@src/constants";
 
 export type Page = {
-  [K in keyof typeof PageItem]: K;
-}[keyof typeof PageItem];
+  [K in keyof typeof FEATURES]: K;
+}[keyof typeof FEATURES];
 
 export type BlocklistData = {
   coin: any[];

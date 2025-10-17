@@ -1,5 +1,7 @@
-import { withUI } from '@extension/ui';
+import baseConfig from "@extension/tailwindcss-config";
+import { withUI } from "@extension/ui";
 
 export default withUI({
-  content: ['index.html', 'src/**/*.tsx'],
+  ...baseConfig,
+  content: ["./index.html", "./src/**/*.tsx"],
 });
