@@ -35,7 +35,14 @@ class CertificateRevoker:
     """證書撤銷器"""
     
     def __init__(self):
-        self.config = SuiConfig.default_config()
+        # 使用環境變量配置，不依賴本地 Sui 配置文件
+        from pysui.sui.sui_clients.common import handle_result
+        from pysui.sui.sui_config import SuiConfig
+        
+        # 創建自定義配置
+        self.config = SuiConfig.user_config(
+            rpc_url=os.getenv("SUI_RPC_URL", "https://fullnode.testnet.sui.io:443")
+        )
         self.client = AsyncClient(self.config)
         self.admin_cap_id = ADMIN_CAP_ID
         self.package_id = PACKAGE_ID

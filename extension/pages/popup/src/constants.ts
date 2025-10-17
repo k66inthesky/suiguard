@@ -22,7 +22,7 @@ export const BLOCKLIST_URLS = {
 };
 
 export const BLOCKLIST_REPORT_URL =
-  "https://docs.google.com/forms/d/e/1FAIpQLSdrJcdsDCP4lq5t6nAltO-Ozab1kCgEhxmFfgml9mRqiISseg/viewform?usp=send_form";
+  "https://docs.google.com/forms/d/1HSsrqDwzCAP-axAI0pUbpRm-x4ktZVaX2xjwiNMAaI4/edit?hl=zh-tw";
 
 // apis
 // export const API_URL = "https://suiguard-385906975905.asia-east1.run.app";

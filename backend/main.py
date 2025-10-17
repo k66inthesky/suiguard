@@ -122,11 +122,11 @@ async def root():
             "Walrus Distributed Caching",
             "Real-time Sui Blockchain Analysis"
         ],
-        "endpoints": {
+                "endpoints": {
             "analyze": "/api/analyze-connection",
-            "version_analysis": "/api/analyze-versions",
-            "health": "/health"
+            "version_analysis": "/api/analyze-versions"
         }
+    }
     }
 
 @app.get("/health")
