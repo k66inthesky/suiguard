@@ -122,57 +122,10 @@ async def root():
             "Walrus Distributed Caching",
             "Real-time Sui Blockchain Analysis"
         ],
-                "endpoints": {
+        "endpoints": {
             "analyze": "/api/analyze-connection",
             "version_analysis": "/api/analyze-versions"
         }
-    }
-    }
-
-@app.get("/health")
-async def health_check():
-    """生產環境健康檢查 - 快速、安全"""
-    current_time = datetime.now().isoformat() + "Z"
-    
-    # 🏥 基礎服務檢查
-    services_status = {
-        "api": "operational",
-        "timestamp": current_time
-    }
-    
-    # 快速檢查核心服務（不進行實際RPC調用以提高響應速度）
-    try:
-        # 檢查服務是否可以初始化
-        MoveCodeAnalyzer()
-        RiskEngine()
-        services_status["core_services"] = "ready"
-    except Exception as e:
-        logger.error(f"Health check failed: {e}")
-        services_status["core_services"] = "degraded"
-    
-    # 檢查環境配置
-    required_env = ["WALRUS_ENDPOINT"]
-    optional_env = ["SUI_RPC_PUBLIC_URL", "SUI_RPC_PROVIDER_URL"]
-    missing_env = [env for env in required_env if not os.getenv(env)]
-    
-    # 檢查是否至少有一個 SUI RPC URL 可用
-    has_sui_rpc = any(os.getenv(env) for env in optional_env)
-    if not has_sui_rpc:
-        missing_env.append("SUI_RPC_PUBLIC_URL or SUI_RPC_PROVIDER_URL")
-    
-    if missing_env:
-        services_status["configuration"] = f"missing: {', '.join(missing_env)}"
-    else:
-        services_status["configuration"] = "complete"
-    
-    # 整體狀態判斷
-    overall_status = "healthy" if services_status["core_services"] == "ready" and services_status["configuration"] == "complete" else "degraded"
-    
-    return {
-        "status": overall_status,
-        "message": "SuiGuard API operational status",
-        "services": services_status,
-        "version": "1.0.0"
     }
 
 @app.post("/api/analyze-connection")

@@ -105,18 +105,21 @@ class RiskEngine:
                 task_type="CAUSAL_LM"
             )
             
-            # 應用 LoRA
-            self.model = get_peft_model(base_model, lora_config)
-            
-            # 如果存在已訓練的模型，加載權重
+            # 如果存在已訓練的模型，直接加載 LoRA 模型
             if os.path.exists(self.model_path):
                 print(f"✅ 加載微調權重: {self.model_path}")
-                self.model.load_adapter(self.model_path)
+                try:
+                    self.model = PeftModel.from_pretrained(base_model, self.model_path)
+                    print("✅ LoRA 微調模型加載成功")
+                except Exception as e:
+                    print(f"⚠️ LoRA 加載失敗，使用基礎模型: {e}")
+                    self.model = get_peft_model(base_model, lora_config)
             else:
-                print(f"⚠️ 未找到微調模型，使用基礎模型: {self.model_path}")
+                print(f"⚠️ 未找到微調模型，使用基礎 LoRA 配置: {self.model_path}")
+                self.model = get_peft_model(base_model, lora_config)
             
             self.model.eval()
-            print("✅ 模型加載完成")
+            print("✅ 模型加載完成並設置為評估模式")
             
         except Exception as e:
             print(f"❌ 模型加載失敗: {e}")
