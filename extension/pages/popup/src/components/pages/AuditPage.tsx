@@ -15,6 +15,8 @@ export default function AuditPage({
     is_legal: boolean;
     recommendation: string;
     timestamp: string;
+    risk_level?: string;
+    security_score?: number;
   } | null>(null);
   const [resultError, setResultError] = useState<boolean>(false);
   const [input, setInput] = useState<{
@@ -85,6 +87,8 @@ export default function AuditPage({
         is_legal: !notLegal,
         recommendation,
         timestamp: formatted,
+        risk_level,
+        security_score: data.confidence ? Math.round(data.confidence * 100) : undefined,
       }));
       setResultError(false);
     } catch (e) {
@@ -99,6 +103,20 @@ export default function AuditPage({
         submitBtnText: "Submit",
         inputError: undefined,
       }));
+    }
+  };
+
+  const handleViewCertificate = async () => {
+    // 開啟新分頁顯示證書頁面
+    const packageId = result?.package_ids[0] || "";
+    const url = `/certificate/index.html?packageId=${encodeURIComponent(packageId)}`;
+    
+    try {
+      await chrome.tabs.create({ url: chrome.runtime.getURL(url) });
+    } catch (e) {
+      console.error("Failed to open certificate page:", e);
+      // Fallback: 如果在開發環境，使用 window.open
+      window.open(url, '_blank');
     }
   };
 
@@ -156,6 +174,15 @@ export default function AuditPage({
           <p className="mb-3 pl-3 text-gray-900">
             Audit Time: {result.timestamp}
           </p>
+          {/* 查看NFT證書按鈕 */}
+          <div className="mt-4 flex justify-center">
+            <button
+              onClick={handleViewCertificate}
+              className="rounded-lg bg-gradient-to-r from-green-500 to-green-600 px-6 py-3 font-medium text-white transition-all hover:from-green-600 hover:to-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+            >
+              🎖️ 查看 NFT 證書
+            </button>
+          </div>
         </div>
       )}
       {resultError && (

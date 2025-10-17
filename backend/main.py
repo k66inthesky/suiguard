@@ -7,6 +7,8 @@ import os
 import logging
 from datetime import datetime
 from dotenv import load_dotenv
+import asyncio
+
 # 載入 .env 文件
 load_dotenv()
 
@@ -24,6 +26,7 @@ try:
     from services.move_analyzer import MoveCodeAnalyzer  
     from services.risk_engine import RiskEngine
     from services.pkg_version_service import PackageVersionService
+    from schedule.schedule_revoke_certificate import start_scheduler
     logger.info("✅ All services imported successfully")
 except Exception as e:
     logger.error(f"❌ Service import failed: {e}")
@@ -42,20 +45,41 @@ app = FastAPI(
     openapi_url=None  # 🔒 生產環境關閉OpenAPI schema
 )
 
-# 🔐 嚴格的CORS設定 - 只允許特定的Chrome Extension
+# 🔐 CORS設定 - 開發環境允許所有來源
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        f"chrome-extension://{os.getenv('CHROME_EXTENSION_ID')}" # 🔒 替換為實際的Extension ID
-    ],
-    allow_credentials=False,  # 🔒 生產環境不允許攜帶認證信息
-    allow_methods=["GET", "POST"],  # 🔒 只允許必要的HTTP方法
-    allow_headers=[
-        "Content-Type",
-        "Accept",
-        "User-Agent"
-    ],  # 🔒 只允許必要的headers
+    allow_origins=["*"],  # 開發模式：允許所有來源
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"],  # 允許所有 headers
 )
+
+# 🔄 定時任務調度器 (啟動時初始化)
+@app.on_event("startup")
+async def startup_event():
+    """應用啟動時執行"""
+    logger.info("🚀 Starting SuiGuard API...")
+    
+    # 啟動證書撤銷定時任務
+    try:
+        scheduler = start_scheduler()
+        app.state.scheduler = scheduler
+        logger.info("✅ Certificate revocation scheduler started")
+    except Exception as e:
+        logger.error(f"❌ Failed to start scheduler: {e}")
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """應用關閉時執行"""
+    logger.info("🛑 Shutting down SuiGuard API...")
+    
+    # 停止調度器
+    if hasattr(app.state, 'scheduler'):
+        try:
+            app.state.scheduler.shutdown()
+            logger.info("✅ Scheduler stopped")
+        except Exception as e:
+            logger.error(f"❌ Error stopping scheduler: {e}")
 
 # Pydantic模型定義
 class ConnectionRequest(BaseModel):
@@ -74,6 +98,15 @@ class PackageVersionRequest(BaseModel):
     class Config:
         min_anystr_length = 1
         max_anystr_length = 1000
+
+class CertificateRequest(BaseModel):
+    """NFT證書請求"""
+    package_id: str
+    wallet_address: str
+    
+    class Config:
+        min_anystr_length = 1
+        max_anystr_length = 200
 
 # 🎯 核心API端點
 @app.get("/")
@@ -255,6 +288,80 @@ async def analyze_package_versions(request: PackageVersionRequest):
     except Exception as e:
         logger.error(f"Package version analysis error: {e}")
         raise HTTPException(status_code=500, detail="Version analysis service temporarily unavailable")
+
+@app.post("/api/request-certificate")
+async def request_certificate(request: CertificateRequest):
+    """🎖️ NFT證書請求端點 - 返回證書鑄造所需數據"""
+    try:
+        package_id = request.package_id.strip()
+        wallet_address = request.wallet_address.strip()
+        
+        # 輸入驗證
+        if not package_id.startswith('0x'):
+            raise HTTPException(status_code=400, detail="Invalid package_id format")
+        if not wallet_address.startswith('0x'):
+            raise HTTPException(status_code=400, detail="Invalid wallet address format")
+        
+        logger.info(f"Certificate request for package: {package_id}, wallet: {wallet_address}")
+        
+        # 重新分析 package 以獲取最新數據
+        move_analyzer = MoveCodeAnalyzer()
+        risk_engine = RiskEngine()
+        
+        # 分析package
+        code_analysis = await move_analyzer.analyze_package(package_id, "certificate_request")
+        source_code = code_analysis.get("source_code", "")
+        
+        # 風險分析
+        overall_risk = await risk_engine.analyze_with_ml_integration(
+            domain="certificate_request",
+            permissions=[],
+            package_analyses=[{
+                "package_id": package_id,
+                "analysis": code_analysis,
+                "status": "success"
+            }],
+            move_source_code=source_code
+        )
+        
+        # 計算安全分數 (0-100)
+        risk_level = overall_risk["risk_level"]
+        confidence = overall_risk["confidence"]
+        
+        # 將風險等級轉換為分數
+        risk_scores = {
+            "LOW": 85,
+            "MEDIUM": 60,
+            "HIGH": 30
+        }
+        base_score = risk_scores.get(risk_level, 50)
+        
+        # 根據confidence調整分數
+        security_score = int(base_score * confidence)
+        security_score = max(0, min(100, security_score))  # 確保在0-100之間
+        
+        # 準備證書數據
+        certificate_data = {
+            "recipient": wallet_address,
+            "package_id": package_id,
+            "risk_level": risk_level,
+            "security_score": security_score,
+            "recommendation": overall_risk["recommendation"],
+            "analyzer_version": "v1.0.0",
+            "timestamp": datetime.now().isoformat() + "Z",
+            "reasons": overall_risk["reasons"],
+            "confidence": confidence,
+        }
+        
+        logger.info(f"Certificate data prepared: {risk_level}, score: {security_score}")
+        
+        return certificate_data
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Certificate request error: {e}")
+        raise HTTPException(status_code=500, detail="Certificate service temporarily unavailable")
 
 # 🔒 生產環境錯誤處理 - 不洩露內部信息
 from fastapi.responses import JSONResponse

@@ -25,5 +25,13 @@ export const BLOCKLIST_REPORT_URL =
   "https://docs.google.com/forms/d/e/1FAIpQLSdrJcdsDCP4lq5t6nAltO-Ozab1kCgEhxmFfgml9mRqiISseg/viewform?usp=send_form";
 
 // apis
-export const API_URL = "https://suiguard-385906975905.asia-east1.run.app";
-// export const API_URL = "http://localhost:8080";
+// export const API_URL = "https://suiguard-385906975905.asia-east1.run.app";
+export const API_URL = "http://localhost:8080";
+
+// Certificate Contract on Sui Testnet
+export const CERTIFICATE_CONTRACT = {
+  PACKAGE_ID: "0xc5bc1fa69949801087a87b623d08a00109d766323a349737e1344adac8373e4b",
+  MODULE: "certificate",
+  FUNCTION: "issue_certificate",
+  NETWORK: "testnet",
+};
