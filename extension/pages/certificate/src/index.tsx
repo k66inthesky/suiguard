@@ -1,5 +1,5 @@
 import "./index.css";
-import Popup from "@src/Popup";
+import Certificate from "./Certificate";
 import { createRoot } from "react-dom/client";
 
 const init = () => {
@@ -9,7 +9,7 @@ const init = () => {
   }
   const root = createRoot(appContainer);
 
-  root.render(<Popup />);
+  root.render(<Certificate />);
 };
 
 init();

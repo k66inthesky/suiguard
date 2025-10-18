@@ -1,11 +1,11 @@
 {
   "extensionDescription": {
     "description": "Extension description",
-    "message": "SuiGuard Chrome extension - design to protect your sui wallet"
+    "message": "AI-powered code audit solution on SUI Blockchain"
   },
   "extensionName": {
-    "description": "Sui Guard",
-    "message": "Chrome extension to protect your sui wallet"
+    "description": "SuiAudit",
+    "message": "SuiAudit"
   },
   "toggleTheme": {
     "message": "Toggle theme"

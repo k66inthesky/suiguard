@@ -15,3 +15,8 @@ export const convertTimestamp = (tstr: string) => {
   const unix = Math.floor(date.getTime() / 1000);
   return { formatted, unix };
 };
+
+export const isValidSuiPackageId = (input: string) => {
+  const suiPackageIdRegex = /^(0x|0X)?[a-fA-F0-9]{1,64}$/;
+  return suiPackageIdRegex.test(input);
+};

@@ -1,18 +1,139 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
-body {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@layer base {
+  body {
+    /* Use Inter as the default font */
+    font-family:
+      "Inter",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      "Roboto",
+      sans-serif;
 
-  font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
-    'Helvetica Neue', sans-serif;
-
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    width: 350px;
+    height: 550px;
+  }
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+@theme {
+  /* --primary-theme: */
+  /* Light Theme Colors (All values are space-separated HSL) */
+  --background: 210 20% 98%;
+  --foreground: 215 25% 15%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 215 25% 15%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 215 25% 15%;
+
+  --primary: 217 91% 35%;
+  --primary-foreground: 0 0% 100%;
+  --primary-light: 217 91% 45%;
+  --primary-glow: 217 91% 60%;
+
+  --secondary: 215 20% 65%;
+  --secondary-foreground: 215 25% 15%;
+
+  --muted: 210 20% 96%;
+  --muted-foreground: 215 15% 45%;
+
+  --accent: 217 91% 92%;
+  --accent-foreground: 217 91% 35%;
+
+  --color-success: 142 71% 45%;
+  --color-success-foreground: 0 0% 100%;
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 215 20% 88%;
+  --input: 215 20% 88%;
+  --ring: 217 91% 35%;
+
+  --radius: 0.75rem;
+
+  /* Gradients */
+  --color-gradient-hero: linear-gradient(
+    135deg,
+    hsl(217 91% 35%),
+    hsl(217 91% 50%)
+  );
+  --color-gradient-card: linear-gradient(
+    180deg,
+    hsl(0 0% 100%),
+    hsl(210 20% 98%)
+  );
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 hsl(215 25% 15% / 0.05);
+  --shadow-md: 0 4px 6px -1px hsl(215 25% 15% / 0.1);
+  --shadow-lg: 0 10px 15px -3px hsl(215 25% 15% / 0.1);
+
+  /* Transition */
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Sidebar Theme */
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-primary: 240 5.9% 10%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 240 4.8% 95.9%;
+  --sidebar-accent-foreground: 240 5.9% 10%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
+  /* Dark Theme Colors */
+  --dark-background: 215 28% 8%;
+  --dark-foreground: 210 20% 98%;
+
+  --dark-card: 215 25% 12%;
+  --dark-card-foreground: 210 20% 98%;
+
+  --dark-popover: 215 25% 12%;
+  --dark-popover-foreground: 210 20% 98%;
+
+  --dark-primary: 217 91% 55%;
+  --dark-primary-foreground: 0 0% 100%;
+  --dark-primary-light: 217 91% 65%;
+  --dark-primary-glow: 217 91% 75%;
+
+  --dark-secondary: 215 20% 25%;
+  --dark-secondary-foreground: 210 20% 98%;
+
+  --dark-muted: 215 25% 15%;
+  --dark-muted-foreground: 215 15% 60%;
+
+  --dark-accent: 215 25% 18%;
+  --dark-accent-foreground: 217 91% 70%;
+
+  --color-dark-success: 142 71% 55%;
+  --color-dark-success-foreground: 0 0% 100%;
+
+  --dark-destructive: 0 84% 65%;
+  --dark-destructive-foreground: 0 0% 100%;
+
+  --dark-border: 215 25% 20%;
+  --dark-input: 215 25% 20%;
+  --dark-ring: 217 91% 55%;
+
+  --dark-gradient-hero: linear-gradient(
+    135deg,
+    hsl(217 91% 45%),
+    hsl(217 91% 60%)
+  );
+  --dark-gradient-card: linear-gradient(
+    180deg,
+    hsl(215 25% 12%),
+    hsl(215 28% 10%)
+  );
+
+  --dark-sidebar-background: 240 5.9% 10%;
+  --dark-sidebar-foreground: 240 4.8% 95.9%;
+  --dark-sidebar-primary: 224.3 76.3% 48%;
+  --dark-sidebar-primary-foreground: 0 0% 100%;
+  --dark-sidebar-accent: 240 3.7% 15.9%;
+  --dark-sidebar-accent-foreground: 240 4.8% 95.9%;
+  --dark-sidebar-border: 240 3.7% 15.9%;
+  --dark-sidebar-ring: 217.2 91.2% 59.8%;
 }

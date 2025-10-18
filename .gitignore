@@ -20,9 +20,11 @@ chrome-extension/manifest.js
 chrome-extension/pre-build.tsconfig.tsbuildinfo
 tsconfig.tsbuildinfo
 
-# env
-**/.env.*
+# env files (keep .env.example for templates)
 **/.env
+**/.env.local
+**/.env.*.local
+!**/.env.example
 
 # etc
 .DS_Store
@@ -31,3 +33,29 @@ tsconfig.tsbuildinfo
 
 # compiled
 **/tailwind-output.css
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+
+# Backend specific
+backend/lora_models/
+backend/ml/models/
+backend/.venv/
+
+# Docker
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+.DS_Store

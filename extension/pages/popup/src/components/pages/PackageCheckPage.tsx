@@ -1,8 +1,9 @@
-import { API_URL } from "@src/constants";
+import { API_URL, FEATURES } from "@src/constants";
 import { Page } from "@src/type";
 import { useState } from "react";
 import ComparisonCard from "../ComparisonCard";
-import Layout from "../Layout";
+import PageLayout from "../PageLayout";
+import { isValidSuiPackageId } from "@src/utils";
 
 export default function PackageCheckPage({
   handlePageChange,
@@ -19,12 +20,14 @@ export default function PackageCheckPage({
     last_pkg_time: string;
     timestamp: string;
   } | null>(null);
+  const [resultError, setResultError] = useState<boolean>(false);
   const [input, setInput] = useState<{
     value: string;
     submitBtnText: string;
     submitStatus: boolean;
     isLatest: boolean;
     checked: boolean;
+    inputError?: string;
   }>({
     value: "",
     submitBtnText: "Search",
@@ -44,7 +47,6 @@ export default function PackageCheckPage({
     const packageIdInput =
       (document.getElementById("packageIdInput") as HTMLInputElement)?.value ??
       "";
-    const ids = packageIdInput.split(",").map((id) => id.trim());
 
     setInput((prev) => ({
       ...prev,
@@ -52,6 +54,18 @@ export default function PackageCheckPage({
       submitStatus: true,
       submitBtnText: "Checking...",
     }));
+
+    // TODO: support multiple package ids input
+    const ids = packageIdInput.split(",").map((id) => id.trim());
+    if (!ids.every(isValidSuiPackageId)) {
+      setInput((prev) => ({
+        ...prev,
+        submitStatus: false,
+        submitBtnText: "Search",
+        inputError: "Package ID not valid",
+      }));
+      return;
+    }
 
     try {
       const res = await fetch(`${API_URL}/api/analyze-versions`, {
@@ -63,6 +77,11 @@ export default function PackageCheckPage({
           package_ids: [...ids],
         }),
       });
+
+      if (!res.ok) {
+        throw new Error("Network response was not ok");
+      }
+
       const data = await res.json();
       const { results, timestamp } = data;
       const {
@@ -99,9 +118,11 @@ export default function PackageCheckPage({
       } else {
         setResult(null);
       }
+      setResultError(false);
     } catch (e) {
       console.error("error:", e);
       setResult(null);
+      setResultError(true);
       setInput((prev) => ({ ...prev, isLatest: false }));
     } finally {
       setInput((prev) => ({
@@ -110,25 +131,36 @@ export default function PackageCheckPage({
         submitStatus: false,
         submitBtnText: "Search",
         checked: false,
+        inpiutError: undefined,
       }));
     }
   };
 
   return (
-    <Layout title="檢查合約是否偷升級？" handlePageChange={handlePageChange}>
-      <div className="lg:col-span-2 ">
-        <div className="flex gap-2 mb-4">
-          <input
-            id="packageIdInput"
-            type="text"
-            placeholder="package_id"
-            className="flex-1 p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            maxLength={100}
-            value={input.value}
-            onChange={handleInputChange}
-          />
+    <PageLayout
+      title={FEATURES.packageCheck}
+      handlePageChange={handlePageChange}
+    >
+      <div className="lg:col-span-2">
+        <div className="mb-4 flex gap-2">
+          <div className="mx-2 flex flex-1 flex-col">
+            <input
+              id="packageIdInput"
+              type="text"
+              placeholder="package_id"
+              className="flex-1 rounded-lg border border-gray-200 p-3 focus:border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              maxLength={200}
+              value={input.value}
+              onChange={handleInputChange}
+            />
+            {input.inputError && (
+              <div className="mt-1 text-xs text-red-500">
+                {input.inputError}
+              </div>
+            )}
+          </div>
           <button
-            className={`bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-all disabled:opacity-50 ${!input.value.trim() || input.submitStatus ? "" : "cursor-pointer"}`}
+            className={`rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 px-6 py-3 font-medium text-white transition-all hover:from-blue-600 hover:to-blue-700 disabled:opacity-50 ${!input.value.trim() || input.submitStatus ? "" : "cursor-pointer"}`}
             disabled={!input.value.trim() || input.submitStatus}
             onClick={handleButtonClick}
           >
@@ -150,13 +182,18 @@ export default function PackageCheckPage({
           </>
         )}
         {input.isLatest && (
-          <div className="bg-green-50 p-4 rounded-xl border border-green-200 text-center">
-            <p className="text-green-800 font-semibold">
-              🎉 你的合約是最新版本，沒有被偷升級！
+          <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-center">
+            <p className="font-semibold text-green-800">
+              🎉 Package version is up-to-date!
             </p>
           </div>
         )}
+        {resultError && (
+          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-center text-sm text-red-600">
+            An error occurred, please try again later
+          </div>
+        )}
       </div>
-    </Layout>
+    </PageLayout>
   );
 }

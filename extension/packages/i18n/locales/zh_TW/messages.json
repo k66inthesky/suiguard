@@ -1,11 +1,11 @@
 {
   "extensionDescription": {
-    "description": "SuiGuard Chrome extension - design to protect your sui wallet",
-    "message": "Check if a SUI blockchain address is on the official blocklist and allow users to report suspicious addresses."
+    "description": "Extension description",
+    "message": "AI-powered code audit solution on SUI Blockchain"
   },
   "extensionName": {
-    "description": "Sui Guard",
-    "message": "Sui Guard"
+    "description": "SuiAudit",
+    "message": "SuiAudit"
   },
   "toggleTheme": {
     "message": "Toggle theme"
