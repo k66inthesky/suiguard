@@ -4,7 +4,7 @@ from datetime import datetime
 import json
 import aiohttp
 import os
-from peft import LoraConfig, get_peft_model
+from peft import LoraConfig, get_peft_model, PeftModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from sklearn.metrics import f1_score
 import torch
