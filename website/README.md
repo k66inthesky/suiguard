@@ -43,7 +43,7 @@ site-builder deploy ./out --epochs [day]
 ```
 
 Update website:
-`ws-resources.json` records object id, make sure to include it in new build `./out`
+`ws-resources.json` records object id, fill in and make sure to include it in new build `./out`
 
 ## 📜 License
 
