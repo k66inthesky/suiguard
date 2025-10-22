@@ -9,7 +9,7 @@
 # Deploy to Sui Mainnet (via Walrus):
 see `https://suiaudit.wal.app/`
 
-https://github.com/user-attachments/assets/e86bb764-5eee-476c-a666-227a94ca7108
+# Video See https://youtu.be/kfZymMtPXIo (will updtae newer via YT)
 
 ---
 
