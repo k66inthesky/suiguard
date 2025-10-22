@@ -4,12 +4,13 @@
 
 # SuiAudit
 
-🛡️ AI-Powered Sui-Mode Audit Solution. 提供AI審計服務，及新商業模型(HOH黑客松提及)。
+🛡️ AI-Powered Sui-Move Code Audit Solution. 提供 AI 審計服務，及新商業模型(HOH 黑客松提及)。
 
 # Deploy to Sui Mainnet (via Walrus):
+
 see `https://suiaudit.wal.app/`
 
-https://github.com/user-attachments/assets/e86bb764-5eee-476c-a666-227a94ca7108
+# Demo Video: https://youtu.be/K3_QJftZTKo
 
 ---
 
@@ -42,6 +43,7 @@ https://github.com/user-attachments/assets/e86bb764-5eee-476c-a666-227a94ca7108
 - Oct. 10, 2025 - Discuss ML code and dateset
 - Oct. 14, 2025 - rebrand and refine core features
 - Oct. 22, 2025 - HOH x SUI Hackathon preparation
+
 ---
 
 ## Features 功能特色
