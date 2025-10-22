@@ -48,26 +48,8 @@ see `https://suiaudit.wal.app/`
 
 ## Features 功能特色
 
-> 詳細功能介紹請參考 [簡報(會再更新)](https://github.com/k66inthesky/suiguard/tree/main/docs)第三頁的 5 點：
+> 詳細功能介紹請參考 [簡報(會持續更新)](https://github.com/k66inthesky/suiguard/tree/main/docs)
 
-1. Sui 版 whoscall - 即時黑名單偵測與回報
-2. 用 ML 模型分析智能合約安全性，並做以下事情：
-   - Sign check - 方便用戶在簽名前，做快速合約檢查
-   - 3-color security light - 讓用戶一眼看出目前瀏覽的網站安全性
-   - Security badge - 讓用戶在瀏覽器上看到網站的安全徽章
-3. Real-time webhook notification - 鏈上有大事時即時通知企業用戶(像是 SUI 生態系的 protocols, wallet, DeFi, NFT marketplace, Memecoins 等項目方)
-
-4. Real-Time Blocklist 初版資料來源
-
-   > 目前正在與 MystenLabs 聯繫，爭取成為官方合作夥伴，取得更即時的黑名單資料，同時也希望能將我們 SuiAudit Lab 用戶提交的黑名單反饋給 MystenLabs。
-   > 黑名單數據來源於 [MystenLabs 官方黑名單倉庫](https://github.com/MystenLabs/wallet_blocklist)
-
-   - coin-list.json
-   - object-list.json
-   - domain-list.json
-   - package-list.json
-
-預期將用戶提交的黑名單：我們自己 own 一個，也分享回報給[MystenLabs](https://github.com/MystenLabs/wallet_blocklist)或[suiet](https://github.com/suiet/guardians)。
 
 ## 安裝方式
 
