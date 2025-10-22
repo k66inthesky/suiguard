@@ -1,12 +1,13 @@
 <div align="center">
-  <img src="extension/icons/logo16.png" alt="SUI Guard Logo" width="64" height="64">
+  <img src="extension/icons/logo16.png" alt="SuiAudit Logo" width="64" height="64">
 </div>
 
-# SUI Guard
+# SuiAudit
 
-🛡️ 一個專為 SUI 區塊鏈生態系統設計的即時安全防護 Chrome 擴展
+🛡️ AI-Powered Sui-Mode Audit Solution. 提供AI審計服務，及新商業模型(HOH黑客松提及)。
 
-Real-time Security Extension for SUI UsersSuiGuard got 3rd place at 2025 Sui Taipei Dev Hackathon
+# Deploy to Sui Mainnet (via Walrus):
+see `https://suiaudit.wal.app/`
 
 https://github.com/user-attachments/assets/e86bb764-5eee-476c-a666-227a94ca7108
 
@@ -19,7 +20,7 @@ https://github.com/user-attachments/assets/e86bb764-5eee-476c-a666-227a94ca7108
 ## 🚀 Join us! 初衷 & 誠摯邀請你加入
 
 - web3 被盜事件太多，想做公益項目造福大家。
-  > 即使是相對安全的 Sui，其生態系的協議也在不斷受到威脅。例如 2025 年 5 月 Cetus 被盜$0.22B、9 月 nemo protocol 被盜$3M。故我們 SuiGuard 團隊期待與您一起做出更助人的 web3 防禦工具！
+  > 即使是相對安全的 Sui，其生態系的協議也在不斷受到威脅。例如 2025 年 5 月 Cetus 被盜$0.22B、9 月 nemo protocol 被盜$3M、10 月 Typus Finance 被盜$3M。故我們 SuiAudit 團隊期待與您一起做出更助人的 web3 防禦工具！
 
 ## Meeting Notes 會議紀要
 
@@ -40,7 +41,7 @@ https://github.com/user-attachments/assets/e86bb764-5eee-476c-a666-227a94ca7108
 - Oct. 07, 2025 - Discuss long-term goal
 - Oct. 10, 2025 - Discuss ML code and dateset
 - Oct. 14, 2025 - rebrand and refine core features
-
+- Oct. 22, 2025 - HOH x SUI Hackathon preparation
 ---
 
 ## Features 功能特色
@@ -56,7 +57,7 @@ https://github.com/user-attachments/assets/e86bb764-5eee-476c-a666-227a94ca7108
 
 4. Real-Time Blocklist 初版資料來源
 
-   > 目前正在與 MystenLabs 聯繫，爭取成為官方合作夥伴，取得更即時的黑名單資料，同時也希望能將我們 SuiGuard 用戶提交的黑名單反饋給 MystenLabs。
+   > 目前正在與 MystenLabs 聯繫，爭取成為官方合作夥伴，取得更即時的黑名單資料，同時也希望能將我們 SuiAudit Lab 用戶提交的黑名單反饋給 MystenLabs。
    > 黑名單數據來源於 [MystenLabs 官方黑名單倉庫](https://github.com/MystenLabs/wallet_blocklist)
 
    - coin-list.json
@@ -103,7 +104,7 @@ See `extension/Readme.md`&`backend/Readme.md`
 1. 填表單(https://forms.gle/oE3AUChoMqkhruD79) ，約費時 22 分鐘。
 2. 請`candidate`自行開 issue，tag 選`join core team`，標題寫[Join Core Team]，並留下填表單的 email，以加速書審。
 3. 通過書審後我們會寄信聯繫`candidate`，通知面試時間，再請`candidate`提早排開行程(面試通常每月一次，面試時間會寫在這份`readme`)。
-4. 面試上會根據`candidate`書審填的表單，對`candidate`進行提問，此舉為確保`candidate`與 SuiGuard core team 方向一致，也避免`candidate`有錯誤期待。
+4. 面試上會根據`candidate`書審填的表單，對`candidate`進行提問，此舉為確保`candidate`與 SuiAuidit Lab core team 方向一致，也避免`candidate`有錯誤期待。
 5. 面試中途會有一 break time(此時`core team member`每人會對`candidate`進行 1-10 分的評分，平均超過 8 分即錄取。)，並當場公布結果。
 6. 審核期: `candidate`需和`core team`一起工作一個月，期間`candidate`須完成指定工作、每次準時交付程式碼。
 7. 審核期期間，若`candidate`表現不適任(e.g.代辦事項沒做、會議遲到超過 10 分鐘且沒事先說明)，會私訊/email 告知並起離。
@@ -111,7 +112,7 @@ See `extension/Readme.md`&`backend/Readme.md`
 
 ### Core team member 與 contributor 有何不同?
 
-- Core team member 為整個 SuiGuard 專案中貢獻最多的人。
+- Core team member 為整個 SuiAudit 專案中貢獻最多的人。
 - 前者一定兼任後者，後者不一定是前者。
 
 ### 下次面試時間 (約 10 月底，會再更新)
