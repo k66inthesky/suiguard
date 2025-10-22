@@ -178,13 +178,21 @@ class CertificateRevoker:
             logger.info("=== 任務結束 ===")
 
 
-# 全局實例
-revoker = CertificateRevoker()
+# 全局實例 - 懶載入
+revoker = None
+
+
+def get_revoker():
+    """獲取撤銷器實例（懶載入）"""
+    global revoker
+    if revoker is None:
+        revoker = CertificateRevoker()
+    return revoker
 
 
 async def scheduled_revoke_task():
     """定時任務包裝函數"""
-    await revoker.revoke_expired_certificates()
+    await get_revoker().revoke_expired_certificates()
 
 
 def start_scheduler():
