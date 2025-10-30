@@ -4,26 +4,25 @@
 
 # SuiAudit
 
-🛡️ AI-Powered Sui-Move Code Audit Solution. 提供 AI 審計服務，及新商業模型(HOH 黑客松提及)。
+🛡️ AI-Powered Sui-Move Code Audit Solution
 
-# Deploy to Sui Mainnet (via Walrus):
+Demo Video: https://youtu.be/K3_QJftZTKo
 
-see `https://suiaudit.wal.app/`
-
-# Demo Video: https://youtu.be/K3_QJftZTKo
+Walrus site: `https://suiaudit.wal.app/`
 
 ---
 
 ## 🏆 Awards
 
-- 🥉 2025 Sui Taipei Dev Hackathon - 3rd Place
+- 🥈 2025 Sui Hackathon Mandarin - 2nd Place([HOH X](https://x.com/0xHOH/status/1983472825689358499) | [Linkedin post](https://www.linkedin.com/posts/lanacchen_hoh%E6%B0%B4%E5%88%86%E5%AD%90-0xhoh-on-x-activity-7389695919820169216-RHr3?utm_source=share&utm_medium=member_desktop&rcm=ACoAAB--lDIBTulv_RZ2aI2p2-GGswKirCBsZ6c))
 
-## 🚀 Join us! 初衷 & 誠摯邀請你加入
+- 🥉 2025 Sui Taipei Dev Hackathon - 3rd Place([VisionM X](https://x.com/VisionM_F/status/1967287863831380271) | [Linkedin post](https://www.linkedin.com/posts/lanacchen_%E4%B8%8A%E9%80%B1%E6%97%A5%E6%88%91%E5%80%91suiguard%E5%9C%98%E9%9A%8A%E6%A6%AE%E7%8D%B2sui-dev-taipei-hackathon-activity-7373541489366409216-tD-Z?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAB--lDIBTulv_RZ2aI2p2-GGswKirCBsZ6c))
 
-- web3 被盜事件太多，想做公益項目造福大家。
-  > 即使是相對安全的 Sui，其生態系的協議也在不斷受到威脅。例如 2025 年 5 月 Cetus 被盜$0.22B、9 月 nemo protocol 被盜$3M、10 月 Typus Finance 被盜$3M。故我們 SuiAudit 團隊期待與您一起做出更助人的 web3 防禦工具！
+## 🚀 Why we build SuiAudit?
 
-## Meeting Notes 會議紀要
+Although Sui's Move language is fast and secure, ecosystem partners still occasionally encounter security incidents. As a fast-growing public blockchain, a strong partner like SuiAudit can help projects build a safer Sui ecosystem!
+
+## Meeting Notes
 
 - Sep. 07, 2025 - Decide key functions(user report, parse string, sign check, AI smart contract check, security badge) and daily tasks in this week.
 - Sep. 08, 2025 - Decide Team collaboration rules, ask for data authorization, and study how to implement sui sign check.
@@ -41,75 +40,73 @@ see `https://suiaudit.wal.app/`
 - Sep. 30, 2025 - Implement ML Phase 1 and Phase 2
 - Oct. 07, 2025 - Discuss long-term goal
 - Oct. 10, 2025 - Discuss ML code and dateset
-- Oct. 14, 2025 - rebrand and refine core features
+- Oct. 14, 2025 - Rebrand and refine core features
 - Oct. 22, 2025 - HOH x SUI Hackathon preparation
 
 ---
 
-## Features 功能特色
+## Features
 
-> 詳細功能介紹請參考 [簡報(會持續更新)](https://github.com/k66inthesky/suiguard/tree/main/docs)
+> See [Presentation](https://github.com/k66inthesky/suiguard/tree/main/docs)
 
-
-## 安裝方式
+## Installation
 
 See `extension/Readme.md`&`backend/Readme.md`
 
-## 貢獻指南
+## Join Us!
 
-歡迎提交 Issues 和 Pull Requests 來改善這個項目！
+We welcome you to raise issues or create pull requests to help improve SuiAudit!
 
-### 如何貢獻
+### Contribution Guidelines
 
-1. Fork 這個倉庫
-2. 建立你的功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交你的更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 開啟一個 Pull Request
+1. Fork this repo
+2. Create your branch (`git checkout -b feature/AmazingFeature`)
+3. Create commit(`git commit -m 'Add some AmazingFeature'`)
+4. Push your branch to remote repo(`git push origin feature/AmazingFeature`)
+5. Create Pull Request
 
-### 回報問題
+### Submit Issues
 
-如果你發現任何問題或有改進建議，請：
+If you want to submit any suggestions or have any questions, feel free to raise an issue.
+Before you raise an issue, kindly do:
 
-- 查看現有的 Issues 避免重複
-- 使用 Issue 模板提供詳細資訊
-- 歡迎讓我知道你對防呆/防亂設計的想法！
+- Check existing issues to avoid any duplicates
+- Use Issue template to avoid any duplicates
+- Let us know your thoughts on error handling
 
-## Core Team Member 核心團隊成員
+## Core Team
 
-👨‍💻 [k66](https://github.com/k66inthesky) - Backend, ML, CI/CD, System Design
+👨‍💻 [k66](https://github.com/k66inthesky) - Backend, ML, CI/CD, System Design, Sui-Move labeling
 
-👨‍💻 [Emily](https://github.com/lienweb) - Frontend, UI/UX, System Design
+👨‍💻 [Emily](https://github.com/lienweb) - Frontend, UI/UX, System Design, Sui-Move labeling
 
-## How to join Core Team Member? 如何加入核心團隊成員? (下稱欲加入者為`candidate`)
+## Member
 
-### 流程:
+👨‍💻 [Jack](https://github.com/RSTsai) - Sui-Move labeling
 
-1. 填表單(https://forms.gle/oE3AUChoMqkhruD79) ，約費時 22 分鐘。
-2. 請`candidate`自行開 issue，tag 選`join core team`，標題寫[Join Core Team]，並留下填表單的 email，以加速書審。
-3. 通過書審後我們會寄信聯繫`candidate`，通知面試時間，再請`candidate`提早排開行程(面試通常每月一次，面試時間會寫在這份`readme`)。
-4. 面試上會根據`candidate`書審填的表單，對`candidate`進行提問，此舉為確保`candidate`與 SuiAuidit Lab core team 方向一致，也避免`candidate`有錯誤期待。
-5. 面試中途會有一 break time(此時`core team member`每人會對`candidate`進行 1-10 分的評分，平均超過 8 分即錄取。)，並當場公布結果。
-6. 審核期: `candidate`需和`core team`一起工作一個月，期間`candidate`須完成指定工作、每次準時交付程式碼。
-7. 審核期期間，若`candidate`表現不適任(e.g.代辦事項沒做、會議遲到超過 10 分鐘且沒事先說明)，會私訊/email 告知並起離。
-8. `core team`根據`candidate`審核期表現對`candidate`進行評分，平均超過 8 分即成為`core team member`，會公告至這份 readme 並於下一次週會/月會上口頭宣告。
+## How to join as Member? (Below we referred you as `candidate`)
 
-### Core team member 與 contributor 有何不同?
+### Recruitment Process:
 
-- Core team member 為整個 SuiAudit 專案中貢獻最多的人。
-- 前者一定兼任後者，後者不一定是前者。
+1. Fill in the [form](https://forms.gle/oE3AUChoMqkhruD79), duration: 30 min.
+2. `Candidate` needs to raise an issue using the tag `join as member`, with title [Join As Member], and use the same email when filling out the form, so we can speed up the process.
+3. We will email the `candidate` to schedule a virtual interview. Please make sure you will attend (normally we interview once a month, it will be announced in this `README`).
+4. We will ask questions based on the information filled out by the `candidate`. We want to learn about you and your motivation, to make sure you and SuiAudit Lab have the same goal, and to avoid false expectations from the `candidate`.
+5. During the interview, we have a small break, during which core team members will evaluate each `candidate` based on a 1-10 score evaluation. Those scoring above 8 will join as `members`. We will announce the result immediately.
+6. Evaluation Period: `candidate` and `core team` will need to work together for a month, during which the `candidate` needs to deliver the assigned tasks on time.
+7. During the evaluation period, if the `candidate` underperforms (e.g., incomplete tasks, late for meetings for more than 10 minutes without giving notice in advance...), we will DM you and kindly ask you to leave the meeting.
+8. The `core team` will evaluate based on the `candidate`'s performance. Those scoring above 8 will become members of SuiAudit Lab, and we will list you on this README and announce at our next meeting.
 
-### 下次面試時間 (約 10 月底，會再更新)
+### Interview Dates:
 
-- 有興趣成為`Core Team Member`者請務必關注此日期。
-- `core team member`會給兩個時段，寫在此供`candidate`擇一與會，不另外提供會議時間，請`candidate`自行提早排開行程。
-- 面試時間會挑月底`core team member`最多人有空之時間。
+- `Core team members` will post available interview dates here. `Candidates` should select one date from the list. No alternative times will be offered, so please clear your schedule accordingly.
+- Interviews are scheduled at month-end when maximum `core team members` are available.
 
-### 成為 core team member 之審核期
+### Evaluation Period To Become A Member
 
-- 約一個月(實際會根據每個月要做的事做事前彈性調整)
-  > 例如 09/28 的面試，因遇到 HOH 黑客松，故`candidate`審核期結束設為 10/22。
-- 每個月月末，所有`core team member`需填寫 review 表單，再根據 review 表單結果，決定`candidate`是否成為`member`。
+- About one month(will adjust due to product roadmap or upcoming events)
+  > eg. Interviewed on Sep. 28, but ended evaluation period on Oct. 22 due to HoH hackathon.
+- At the end of every month, all `core team member` fill in a review form to decide whether `candidate` will become a `member` at SuiAudit Lab.
 
 ## License
 
@@ -118,7 +115,5 @@ Apache License 2.0, see [LICENSE](./LICENSE).
 ---
 
 <div align="center">
-  為 SUI 生態系統的安全做出貢獻 🚀
-  <br>
-  <sub>Built with ❤️ for the SUI Community</sub>
+  Built with ❤️ for the SUI Community
 </div>
