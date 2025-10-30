@@ -14,7 +14,7 @@ Walrus site: `https://suiaudit.wal.app/`
 
 ## 🏆 Awards
 
-- 🥈 2025 Sui Hackathon Mandarin - 2nd Place([HOH X](https://x.com/0xHOH/status/1983472825689358499) | [Linkedin post](https://www.linkedin.com/posts/emily-fang-yu-lien_suiaudit-suihackathon-ai-activity-7389593724927991808-Kei0?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAB--lDIBTulv_RZ2aI2p2-GGswKirCBsZ6c))
+- 🥈 2025 Sui Hackathon Mandarin - 2nd Place([HOH X](https://x.com/0xHOH/status/1983472825689358499) | [Linkedin post](https://www.linkedin.com/posts/lanacchen_hoh%E6%B0%B4%E5%88%86%E5%AD%90-0xhoh-on-x-activity-7389695919820169216-RHr3?utm_source=share&utm_medium=member_desktop&rcm=ACoAAB--lDIBTulv_RZ2aI2p2-GGswKirCBsZ6c))
 
 - 🥉 2025 Sui Taipei Dev Hackathon - 3rd Place([VisionM X](https://x.com/VisionM_F/status/1967287863831380271) | [Linkedin post](https://www.linkedin.com/posts/lanacchen_%E4%B8%8A%E9%80%B1%E6%97%A5%E6%88%91%E5%80%91suiguard%E5%9C%98%E9%9A%8A%E6%A6%AE%E7%8D%B2sui-dev-taipei-hackathon-activity-7373541489366409216-tD-Z?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAB--lDIBTulv_RZ2aI2p2-GGswKirCBsZ6c))
 
