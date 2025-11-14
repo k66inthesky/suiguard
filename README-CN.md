@@ -43,6 +43,12 @@ see `https://suiaudit.wal.app/`
 - Oct. 10, 2025 - Discuss ML code and dateset
 - Oct. 14, 2025 - rebrand and refine core features
 - Oct. 22, 2025 - HOH x SUI Hackathon preparation
+- Oct. 24, 2025 - Team Direction Alignment
+- Nov. 07, 2025 - Paper Review Discussion
+- Nov. 08, 2025 - Task Planning & Assignment
+- Nov. 11, 2025 - Data Format Discussion, Sui Move Smart Contract Study
+- Nov. 13, 2025 - Data & Testing Method Discussion, Task Detail Planning
+
 
 ---
 
