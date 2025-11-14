@@ -43,8 +43,8 @@ Although Sui's Move language is fast and secure, ecosystem partners still occasi
 - Oct. 14, 2025 - Rebrand and refine core features
 - Oct. 22, 2025 - HOH x SUI Hackathon preparation
 - Oct. 24, 2025 - Team Direction Alignment
-- Nov. 07, 2025 - Paper Review Discussion
-- Nov. 08, 2025 - Task Planning & Assignment
+- Nov. 07, 2025 - Sui-Move security paper study session
+- Nov. 08, 2025 - Walrus hackathon task planning and assignment
 - Nov. 11, 2025 - Data Format Discussion, Sui Move Smart Contract Study
 - Nov. 13, 2025 - Data & Testing Method Discussion, Task Detail Planning
 
