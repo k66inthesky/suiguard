@@ -41,8 +41,14 @@ see `https://suiaudit.wal.app/`
 - Sep. 30, 2025 - Implement ML Phase 1 and Phase 2
 - Oct. 07, 2025 - Discuss long-term goal
 - Oct. 10, 2025 - Discuss ML code and dateset
-- Oct. 14, 2025 - rebrand and refine core features
+- Oct. 14, 2025 - Rebrand and refine core features
 - Oct. 22, 2025 - HOH x SUI Hackathon preparation
+- Oct. 24, 2025 - Team Direction Alignment
+- Nov. 07, 2025 - Sui-Move security paper study session
+- Nov. 08, 2025 - Walrus hackathon task planning and assignment
+- Nov. 11, 2025 - Data Format Discussion, Sui Move Smart Contract Study
+- Nov. 13, 2025 - Data & Testing Method Discussion, Task Detail Planning
+
 
 ---
 
