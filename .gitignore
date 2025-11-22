@@ -50,8 +50,24 @@ backend/lora_models/
 backend/ml/models/
 backend/.venv/
 
+# VS Code Extension specific
+vscode-extension/node_modules/
+vscode-extension/out/
+vscode-extension/.vscode-test/
+vscode-extension/package-lock.json
+vscode-extension/*.vsix
+
+# zkLogin Integration
+zklogin-integration/node_modules/
+zklogin-integration/package-lock.json
+zklogin-integration/*.log
+
 # Docker
 *.log
+
+# Move/Sui contracts
+**/build/
+Move.lock
 
 # Temporary files
 *.tmp

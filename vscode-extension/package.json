@@ -1,0 +1,120 @@
+{
+  "name": "suiguard-vscode-extension",
+  "displayName": "SuiGuard Security Auditor",
+  "description": "VS Code extension for Sui blockchain smart contract security auditing with zkLogin integration",
+  "version": "0.0.1",
+  "publisher": "SuiGuard",
+  "icon": "assets/logo128.png",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "suiguard.login",
+        "title": "會員登入 (zkLogin)",
+        "category": "SuiAudit",
+        "icon": "assets/logo16.png"
+      },
+      {
+        "command": "suiguard.analyzeCode",
+        "title": "🔍 AI 審計選中程式碼",
+        "category": "SuiAudit",
+        "icon": "assets/logo16.png"
+      },
+      {
+        "command": "suiguard.quickAnalyze",
+        "title": "⚡ 快速審計",
+        "category": "SuiAudit",
+        "icon": "assets/logo16.png"
+      },
+      {
+        "command": "suiguard.realTimeAnalyze",
+        "title": "🚀 即時漏洞分析",
+        "category": "SuiAudit",
+        "icon": "assets/logo16.png"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "suiguard.analyzeCode",
+          "when": "editorHasSelection",
+          "group": "suiguard@1"
+        },
+        {
+          "command": "suiguard.quickAnalyze",
+          "when": "editorHasSelection",
+          "group": "suiguard@2"
+        },
+        {
+          "command": "suiguard.realTimeAnalyze",
+          "when": "editorTextFocus",
+          "group": "suiguard@3"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "suiguard.realTimeAnalyze",
+          "when": "resourceExtname == .move",
+          "group": "navigation"
+        },
+        {
+          "command": "suiguard.login",
+          "when": "resourceExtname == .move || resourceExtname == .rs || resourceExtname == .sol",
+          "group": "navigation"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "suiguard",
+          "title": "SuiAudit",
+          "icon": "assets/logo48.png"
+        }
+      ]
+    },
+    "views": {
+      "suiguard": [
+        {
+          "id": "suiguardAudit",
+          "name": "🔍 代碼安全審計"
+        },
+        {
+          "id": "suiguardLogin",
+          "name": "👤 會員功能"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "suiguard.analyzeCode",
+        "key": "ctrl+shift+a",
+        "mac": "cmd+shift+a",
+        "when": "editorHasSelection"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "16.x",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "@mysten/sui.js": "^0.54.1"
+  }
+}

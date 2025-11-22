@@ -1,0 +1,72 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "npm",
+            "script": "compile",
+            "group": "build",
+            "presentation": {
+                "panel": "dedicated",
+                "reveal": "never"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/vscode-extension"
+            },
+            "problemMatcher": [
+                "$tsc"
+            ]
+        },
+        {
+            "type": "npm",
+            "script": "watch",
+            "group": "build",
+            "presentation": {
+                "panel": "dedicated",
+                "reveal": "never"
+            },
+            "isBackground": true,
+            "options": {
+                "cwd": "${workspaceFolder}/vscode-extension"
+            },
+            "problemMatcher": [
+                "$tsc-watch"
+            ]
+        },
+        {
+            "label": "啟動 zkLogin 服務",
+            "type": "shell",
+            "command": "node",
+            "args": ["src/zklogin-service.js"],
+            "options": {
+                "cwd": "${workspaceFolder}/zklogin-integration"
+            },
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new"
+            },
+            "isBackground": true,
+            "problemMatcher": []
+        },
+        {
+            "label": "啟動後端服務",
+            "type": "shell",
+            "command": "python3",
+            "args": ["main.py"],
+            "options": {
+                "cwd": "${workspaceFolder}/backend"
+            },
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "new"
+            },
+            "isBackground": true,
+            "problemMatcher": []
+        }
+    ]
+}

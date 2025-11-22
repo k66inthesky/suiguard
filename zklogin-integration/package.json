@@ -1,0 +1,21 @@
+{
+  "name": "zklogin-integration",
+  "version": "1.0.0",
+  "description": "zkLogin integration service for SuiGuard VS Code extension",
+  "main": "src/zklogin-service.js",
+  "dependencies": {
+    "@mysten/sui": "^1.0.0",
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "jsonwebtoken": "^9.0.0",
+    "axios": "^1.6.0"
+  },
+  "scripts": {
+    "start": "node src/zklogin-service.js",
+    "dev": "nodemon src/zklogin-service.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["sui", "zklogin", "blockchain", "oauth"],
+  "author": "SuiGuard Team",
+  "license": "MIT"
+}
