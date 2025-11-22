@@ -29,8 +29,10 @@ public struct SUBSCRIPTION has drop {}
 
 // 使用泛型來支援任何代幣類型（如真實的 USDC）
 
-const USDC_FEE: u64 = 100_000; // 0.1 USDC (6 位小數)
+const USDC_FEE: u64 = 20_000_000; // 20 USDC
+// const USDC_FEE: u64 = 100_000; // 0.1 USDC (6 位小數)
 const TTL_24_HOURS: u64 = 24 * 60 * 60 * 1000; // 24 小時 (毫秒)
+// const TTL_24_HOURS: u64 = 10 * 1000; // 10 秒鐘 (毫秒)
 
 public struct Service has key {
     id: UID,
