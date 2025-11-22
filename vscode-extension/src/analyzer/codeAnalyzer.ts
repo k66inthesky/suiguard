@@ -42,7 +42,7 @@ export class CodeAnalyzer {
                 timeout: 30000, // 30秒超時
                 headers: {
                     'Content-Type': 'application/json',
-                    'User-Agent': 'SuiGuard-VSCode-Extension/0.0.1'
+                    'User-Agent': 'SuiAudit-VSCode-Extension/0.0.1'
                 }
             });
 
@@ -177,6 +177,31 @@ export class CodeAnalyzer {
             analysisTime: rawData.analysis_time || rawData.timestamp || new Date().toISOString(),
             details: rawData.details || rawData
         };
+    }
+
+    async analyzeRealTime(sourceCode: string, fileName: string): Promise<any> {
+        try {
+            const response = await axios.post(`${this.backendUrl}/api/real-time-analyze`, {
+                source_code: sourceCode,
+                file_name: fileName
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                timeout: 30000 // 30 秒超時
+            });
+
+            return {
+                success: true,
+                analysis: response.data
+            };
+        } catch (error: any) {
+            console.error('Real-time analysis error:', error);
+            return {
+                success: false,
+                error: error.response?.data?.detail || error.message || '分析服務暫時無法使用'
+            };
+        }
     }
 
     public updateBackendUrl(url: string): void {

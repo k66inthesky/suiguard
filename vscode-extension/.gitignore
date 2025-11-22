@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Compiled output
+out/
+dist/
+
+# VS Code extension package
+*.vsix
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.vscode/launch.json
+
+# Environment
+.env
+.env.local

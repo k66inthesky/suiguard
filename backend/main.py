@@ -155,6 +155,14 @@ class ContractAnalysisRequest(BaseModel):
     modules: Optional[List[str]] = []
     timestamp: str
 
+class RealTimeAnalysisRequest(BaseModel):
+    """即時代碼分析請求"""
+    source_code: str  # Move 源代碼
+    file_name: Optional[str] = "unknown.move"
+    
+    class Config:
+        min_anystr_length = 1
+
 # 🎯 核心API端點
 @app.get("/")
 async def root():
@@ -170,11 +178,103 @@ async def root():
             "Real-time Sui Blockchain Analysis"
         ],
         "endpoints": {
+            "real_time_analyze": "/api/real-time-analyze",
             "analyze": "/api/analyze-connection",
             "version_analysis": "/api/analyze-versions"
         }
     }
 
+# 即時分析合約風險
+@app.post("/api/real-time-analyze")
+async def real_time_analyze(request: RealTimeAnalysisRequest):
+    """🎯 即時代碼分析端點 - 分析用戶提供的 Move 源代碼"""
+    try:
+        source_code = request.source_code.strip()
+        file_name = request.file_name
+        
+        # 輸入驗證
+        if not source_code:
+            raise HTTPException(status_code=400, detail="source_code is required")
+        
+        if len(source_code) > 100000:  # 限制代碼長度
+            raise HTTPException(status_code=400, detail="Source code too large (max: 100KB)")
+        
+        logger.info(f"Real-time analyzing code from: {file_name}")
+        
+        # 初始化核心服務
+        risk_engine = RiskEngine()
+        
+        # 風險分析
+        overall_risk = await risk_engine.analyze_with_ml_integration(
+            domain="real_time_analysis",
+            permissions=[],
+            package_analyses=[{
+                "package_id": "real_time_analysis",
+                "analysis": {
+                    "file_name": file_name,
+                    "source_code": source_code
+                },
+                "status": "success"
+            }],
+            move_source_code=source_code
+        )
+        
+        # 計算風險分數
+        risk_level = overall_risk["risk_level"]
+        confidence = overall_risk["confidence"]
+        
+        # 風險分數映射 (0-100)
+        risk_scores = {
+            "LOW": 25,
+            "MEDIUM": 50,
+            "HIGH": 75,
+            "CRITICAL": 95
+        }
+        risk_score = risk_scores.get(risk_level, 50)
+        
+        # 提取漏洞和建議
+        vulnerabilities = []
+        recommendations = []
+        security_issues = []
+        
+        # 從分析結果中提取問題
+        for reason in overall_risk.get("reasons", []):
+            if "vulnerability" in reason.lower() or "security" in reason.lower():
+                vulnerabilities.append(reason)
+            elif "recommend" in reason.lower() or "should" in reason.lower():
+                recommendations.append(reason)
+            else:
+                security_issues.append(reason)
+        
+        # 構建回應
+        analysis_result = {
+            "file_name": file_name,
+            "risk_score": risk_score,
+            "confidence": confidence * 100,  # 轉換為百分比
+            "risk_level": risk_level,
+            "vulnerabilities": vulnerabilities,
+            "security_issues": security_issues,
+            "recommendations": recommendations or [overall_risk["recommendation"]],
+            "ml_analysis": {
+                "analysis_method": overall_risk["details"].get("analysis_method", "rules_only"),
+                "model_version": "v1.0",
+                "processing_time": overall_risk["details"].get("processing_time", 0)
+            },
+            "timestamp": datetime.now().isoformat() + "Z"
+        }
+        
+        logger.info(f"Real-time analysis completed: {risk_level} ({risk_score}/100)")
+        
+        return analysis_result
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Real-time analysis error: {e}")
+        raise HTTPException(status_code=500, detail="Analysis service temporarily unavailable")
+    
+
+# 查詢整個合約，輸入只需 package_ids 即可
 @app.post("/api/analyze-connection")
 async def analyze_connection(request: ConnectionRequest):
     """🎯 主要業務端點 - Chrome Extension用戶合約分析"""
@@ -546,29 +646,29 @@ async def trigger_package_scan():
                     modules=[f"{protocol}_module"]
                 )
                 
-                # 發送合約檢測通知
-                await app.state.protocol_tracker.notifier.notify_contract_detected(
-                    protocol=protocol,
-                    package_id=package_id,
-                    deployer=deployer,
-                    transaction_digest=contract_event.transaction_digest
-                )
+                # 發送合約檢測通知 (開發時註解以避免干擾)
+                # await app.state.protocol_tracker.notifier.notify_contract_detected(
+                #     protocol=protocol,
+                #     package_id=package_id,
+                #     deployer=deployer,
+                #     transaction_digest=contract_event.transaction_digest
+                # )
                 
-                # 等待 2 秒後發送風險分析通知
-                await asyncio.sleep(2)
+                # 等待 2 秒後發送風險分析通知 (開發時註解)
+                # await asyncio.sleep(2)
                 
-                # 發送風險分析通知
-                await app.state.protocol_tracker.notifier.notify_risk_analysis(
-                    protocol=protocol,
-                    package_id=package_id,
-                    risk_level=risk_level,
-                    risk_score=risk_score,
-                    confidence=analysis_result["confidence"],
-                    vulnerabilities=analysis_result["vulnerabilities"],
-                    security_issues=analysis_result["security_issues"],
-                    recommendations=analysis_result["recommendations"],
-                    ml_analysis=analysis_result["ml_analysis"]
-                )
+                # 發送風險分析通知 (開發時註解以避免干擾)
+                # await app.state.protocol_tracker.notifier.notify_risk_analysis(
+                #     protocol=protocol,
+                #     package_id=package_id,
+                #     risk_level=risk_level,
+                #     risk_score=risk_score,
+                #     confidence=analysis_result["confidence"],
+                #     vulnerabilities=analysis_result["vulnerabilities"],
+                #     security_issues=analysis_result["security_issues"],
+                #     recommendations=analysis_result["recommendations"],
+                #     ml_analysis=analysis_result["ml_analysis"]
+                # )
                 
                 results.append(analysis_result)
                 
@@ -576,7 +676,7 @@ async def trigger_package_scan():
                 
                 # 更新統計
                 app.state.protocol_tracker.stats['contracts_detected'] += 1
-                app.state.protocol_tracker.stats['notifications_sent'] += 2
+                # app.state.protocol_tracker.stats['notifications_sent'] += 2  # 開發時註解
                 if risk_level in ["HIGH", "CRITICAL"]:
                     app.state.protocol_tracker.stats['high_risk_found'] += 1
                 

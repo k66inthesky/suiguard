@@ -1,4 +1,4 @@
-# SuiGuard VS Code Extension
+# SuiAudit VS Code Extension
 
 一個專為 Sui 區塊鏈智能合約安全審計設計的 VS Code 擴展，具備 zkLogin 會員登入和 AI 代碼分析功能。
 
@@ -33,7 +33,7 @@
 
 ### 會員登入
 
-1. 在側邊欄找到 SuiGuard 圖示
+1. 在側邊欄找到 SuiAudit 圖示
 2. 點擊「會員登入」
 3. 選擇登入方式（Sui Wallet/Google/GitHub）
 4. 完成 zkLogin 身份驗證流程
@@ -51,7 +51,7 @@
 
 #### 方法三：命令面板
 1. 按 `Ctrl+Shift+P` 開啟命令面板
-2. 輸入 \"SuiGuard\" 找到相關命令
+2. 輸入 \"SuiAudit\" 找到相關命令
 3. 執行代碼分析
 
 ## 技術架構

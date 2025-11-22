@@ -20,19 +20,25 @@
       {
         "command": "suiguard.login",
         "title": "會員登入 (zkLogin)",
-        "category": "SuiGuard",
+        "category": "SuiAudit",
         "icon": "assets/logo16.png"
       },
       {
         "command": "suiguard.analyzeCode",
         "title": "🔍 AI 審計選中程式碼",
-        "category": "SuiGuard",
+        "category": "SuiAudit",
         "icon": "assets/logo16.png"
       },
       {
         "command": "suiguard.quickAnalyze",
         "title": "⚡ 快速審計",
-        "category": "SuiGuard",
+        "category": "SuiAudit",
+        "icon": "assets/logo16.png"
+      },
+      {
+        "command": "suiguard.realTimeAnalyze",
+        "title": "🚀 即時漏洞分析",
+        "category": "SuiAudit",
         "icon": "assets/logo16.png"
       }
     ],
@@ -47,9 +53,19 @@
           "command": "suiguard.quickAnalyze",
           "when": "editorHasSelection",
           "group": "suiguard@2"
+        },
+        {
+          "command": "suiguard.realTimeAnalyze",
+          "when": "editorTextFocus",
+          "group": "suiguard@3"
         }
       ],
       "editor/title": [
+        {
+          "command": "suiguard.realTimeAnalyze",
+          "when": "resourceExtname == .move",
+          "group": "navigation"
+        },
         {
           "command": "suiguard.login",
           "when": "resourceExtname == .move || resourceExtname == .rs || resourceExtname == .sol",
@@ -61,7 +77,7 @@
       "activitybar": [
         {
           "id": "suiguard",
-          "title": "SuiGuard",
+          "title": "SuiAudit",
           "icon": "assets/logo48.png"
         }
       ]
@@ -69,14 +85,12 @@
     "views": {
       "suiguard": [
         {
-          "id": "suiguardLogin",
-          "name": "會員登入",
-          "when": "!suiguard.loggedIn"
+          "id": "suiguardAudit",
+          "name": "🔍 代碼安全審計"
         },
         {
-          "id": "suiguardAudit",
-          "name": "程式碼審計",
-          "when": "suiguard.loggedIn"
+          "id": "suiguardLogin",
+          "name": "👤 會員功能"
         }
       ]
     },
