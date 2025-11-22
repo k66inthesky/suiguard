@@ -11,9 +11,6 @@ import logging
 from datetime import datetime
 from dotenv import load_dotenv
 import asyncio
-from pysui import SuiConfig, SyncClient
-from pysui.sui.sui_txn import SyncTransaction
-from pysui.sui.sui_types.scalars import ObjectID, SuiU64, SuiString
 
 
 
@@ -744,36 +741,113 @@ async def create_report(request: GenerateReportRequest):
         if not package_id.startswith("0x"):
             raise HTTPException(status_code=400, detail="Invalid package_id format")
         
-        if not package_id.startswith("0x"):
-            raise HTTPException(status_code=400, detail="Invalid package_id format: Must start with '0x'")
-        
         logger.info(f"✅ package_id '{package_id}' 驗證通過。")
 
-        # 2. 檔案內容定義
-        logger.info("--- 2. 準備檔案內容 ---")
-        file_name = f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
-        content = [
-            f"--- 報告生成 ---",
-            "這是檔案的第一行內容 (繁體中文測試)。",
-            f"This is the second line (English check).",
-            # "數字和特殊字元: 12345, !@#$",
-            # "處理的 Package ID: {package_id}",
-            "--- 文件結束 ---"
-        ]
-        output_data = "\n".join(content) # 使用換行符連接列表中的元素
-
-        # 3. 檔案寫入操作
-        # 使用 io.StringIO 創建一個記憶體中的文字檔案
-        logger.info(f"--- 3. 寫入檔案: {file_name} ---")
-        file_buffer = io.StringIO(output_data)
+        # 2. 生成簡單的 PDF 檔案（使用原生方式）
+        logger.info("--- 2. 準備 PDF 內容 ---")
+        file_name = f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+        
+        # 使用 BytesIO 創建記憶體中的 PDF 檔案
+        pdf_buffer = io.BytesIO()
+        
+        # 生成基本的 PDF 內容（符合 PDF 1.4 規範）
+        pdf_content = f"""%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/Resources <<
+/Font <<
+/F1 <<
+/Type /Font
+/Subtype /Type1
+/BaseFont /Helvetica-Bold
+>>
+/F2 <<
+/Type /Font
+/Subtype /Type1
+/BaseFont /Helvetica
+>>
+>>
+>>
+/MediaBox [0 0 595 842]
+/Contents 4 0 R
+>>
+endobj
+4 0 obj
+<<
+/Length 500
+>>
+stream
+BT
+/F1 24 Tf
+50 750 Td
+(SuiAudit Security Report) Tj
+0 -40 Td
+/F2 12 Tf
+(Package ID: {package_id}) Tj
+0 -20 Td
+(Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}) Tj
+0 -40 Td
+/F1 16 Tf
+(Report Summary) Tj
+0 -30 Td
+/F2 12 Tf
+(This is a sample security audit report for the) Tj
+0 -20 Td
+(specified smart contract package.) Tj
+0 -20 Td
+(The analysis includes vulnerability detection) Tj
+0 -20 Td
+(and risk assessment.) Tj
+0 -30 Td
+(Status: Analysis Complete) Tj
+ET
+endstream
+endobj
+xref
+0 5
+0000000000 65535 f
+0000000009 00000 n
+0000000058 00000 n
+0000000115 00000 n
+0000000366 00000 n
+trailer
+<<
+/Size 5
+/Root 1 0 R
+>>
+startxref
+916
+%%EOF
+"""
+        
+        # 寫入 PDF 內容到 buffer
+        pdf_buffer.write(pdf_content.encode('utf-8'))
+        pdf_buffer.seek(0)
+        
+        logger.info(f"--- 3. 生成 PDF: {file_name} ---")
      
-        # 3. 回傳 StreamingResponse
-        # content=file_buffer: 直接串流記憶體內容
-        # media_type: 告訴瀏覽器這是純文字
-        # headers: 設置 Content-Type 讓瀏覽器直接顯示文字內容而不是下載
+        # 4. 回傳 StreamingResponse
         return StreamingResponse(
-            content=file_buffer,
-            media_type="text/plain; charset=utf-8"
+            content=pdf_buffer,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f"inline; filename={file_name}"
+            }
         )
     
     except HTTPException as e:
