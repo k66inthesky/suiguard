@@ -30,12 +30,8 @@ export const DEVNET_PACKAGE_ID =
   '0x33a29593d06ba454a50f3e03d19e96af72710335777692566bb3125d78610782';
 export const MAINNET_PACKAGE_ID = '0xTODO';
 
-// TODO:決定 called package
 export const TESTNET_PACKAGE_ID =
   '0xc173db0c6886cf0ba5dba6c4a80d7037e63f332847e176cebe0acd9043a01b78';
-// '0xa263d11bd0106f9c83aa7029d15ac5f6687a7f69fb6530d76eee2c0c423185d9'; // old?
-// '0xc5ce2742cac46421b62028557f1d7aea8a4c50f651379a79afdf12cd88628807'; // example package
-// '0x81eb32028f1d1f23ee991d7c1eb90b3c79743dc7c19a990e60a6fbd350917c2b';
 
 // Certificate Contract on Sui Testnet
 export const CERTIFICATE_CONTRACT = {
@@ -140,12 +136,7 @@ export const walrusServices: WalrusService[] = [
   },
 ];
 
-export const SUI_TYPE = '0x2::sui::SUI';
-
 export const USDC_TYPE =
   '0xa1ec7fc00a6f40db9693ad1415d0c193ad3906494428cf252621037bd7117e29::usdc::USDC';
-
-export const SUBSCRIPTION_SERVICE_ID =
-  '0x6bb686b73ae1a7360eac6b18789de6e81523d01b8682211cd3c83a3a291e5dfb';
 
 export const CLOCK_ID = '0x6';

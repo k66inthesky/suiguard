@@ -9,19 +9,18 @@ import { SealClient, SessionKey } from '@mysten/seal';
 import { Transaction } from '@mysten/sui/transactions';
 import { fromHex, SUI_CLOCK_OBJECT_ID, toHex } from '@mysten/sui/utils';
 import { Box, Button, Container, Flex, Heading } from '@radix-ui/themes';
-import { Suspense, useState } from 'react';
+import { useState } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import {
   BASE_URL,
   CLOCK_ID,
   PUBLISHER_TESTNET,
   serverObjectIds,
-  SUBSCRIPTION_SERVICE_ID,
   SUISCAN_URL_TESTNET,
   USDC_TYPE,
 } from './constants';
 import { useNetworkVariable } from './networkConfig';
-import { MoveCallConstructor, Page, ValidSubscription } from './types';
+import { MoveCallConstructor, ValidSubscription } from './types';
 import { downloadAndDecrypt, generateFileName, getAggregatorUrl, getAllCoins } from './utils';
 
 export type StorageInfo = {
@@ -47,8 +46,8 @@ function App() {
   const [validSubscription, setValidSubscription] = useState<ValidSubscription | undefined>(
     undefined,
   );
-  const [decryptedFileUrls, setDecryptedFileUrls] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [serviceId, setServiceId] = useState<string>('');
 
   const suiClient = useSuiClient();
   const packageId = useNetworkVariable('packageId');
@@ -74,66 +73,78 @@ function App() {
     verifyKeyServers: false,
   });
 
-  /** buy nft */
-  async function buyAndVerifySubscription(coins: {
-    data: Array<{ coinObjectId: string; balance: string }>;
-  }): Promise<{ status: string; data: any }> {
+  async function createService(): Promise<{ status: string; data: any }> {
+    const tx = new Transaction();
+    tx.moveCall({
+      target: `${packageId}::main::setup_suiaudit_service`,
+    });
+    tx.setGasBudget(10000000);
+
+    return new Promise<{ status: string; data: any }>((resolve, reject) => {
+      signAndExecute(
+        { transaction: tx },
+        {
+          onSuccess: async (result) => {
+            const subscriptionObject = result.effects?.created?.find(
+              (item) => item.owner && typeof item.owner === 'object' && 'Shared' in item.owner,
+            );
+            const createdObjectId = subscriptionObject?.reference?.objectId;
+            if (createdObjectId) {
+              setServiceId(createdObjectId);
+              return resolve({ status: 'ok', data: createdObjectId });
+            }
+            return resolve({ status: 'error', data: createdObjectId });
+          },
+          onError: (error) => {
+            console.error('Transaction failed:', error);
+            reject({ status: 'error', data: error });
+          },
+        },
+      );
+    });
+  }
+
+  /** buy nft - merge all coins -> split exact amount -> buy */
+  async function buyAndVerifySubscription(
+    coins: {
+      data: Array<{ coinObjectId: string; balance: string }>;
+    },
+    serviceId: string,
+  ): Promise<{ status: string; data: any }> {
     const ONE_OF_TEN_USDC = 100_000; // 0.1 USDC (6 decimals)
-
-    console.log('coins:', coins);
-
     if (!coins.data || coins.data.length === 0) {
       throw new Error('No USDC coins found');
     }
 
-    // 找出餘額足夠的 USDC coin
-    const suitableCoin = coins.data.find((coin) => BigInt(coin.balance) >= BigInt(ONE_OF_TEN_USDC));
-    console.log('suitable coins:', suitableCoin);
+    // 計算總餘額
+    const totalBalance = coins.data.reduce((sum, coin) => sum + BigInt(coin.balance), BigInt(0));
+    console.log('Total USDC balance:', totalBalance.toString());
 
-    // Case 1: 有單個 coin 餘額足夠 -> split coin
-    const tx = new Transaction();
-    let coinToUse;
-
-    if (suitableCoin) {
-      console.log('Found suitable coin, splitting...');
-      [coinToUse] = tx.splitCoins(tx.object(suitableCoin.coinObjectId), [
-        tx.pure.u64(ONE_OF_TEN_USDC),
-      ]);
-    } else {
-      // Case 2: 沒有單個 coin 足夠 -> merge coins
-      console.log('No single coin sufficient, merging...');
-      // 計算總餘額
-      const totalBalance = coins.data.reduce((sum, coin) => sum + BigInt(coin.balance), BigInt(0));
-
-      if (totalBalance < BigInt(ONE_OF_TEN_USDC)) {
-        throw new Error(
-          `Insufficient total USDC balance. Need: ${ONE_OF_TEN_USDC}, Have: ${totalBalance}`,
-        );
-      }
-
-      // 取第一個 coin 作為主 coin
-      const primaryCoin = coins.data[0];
-      const otherCoins = coins.data.slice(1).map((coin) => tx.object(coin.coinObjectId));
-
-      // Merge 其他 coins 到主 coin
-      if (otherCoins.length > 0) {
-        tx.mergeCoins(tx.object(primaryCoin.coinObjectId), otherCoins);
-      }
-
-      // Split 出需要的金額
-      [coinToUse] = tx.splitCoins(tx.object(primaryCoin.coinObjectId), [
-        tx.pure.u64(ONE_OF_TEN_USDC),
-      ]);
+    if (totalBalance < BigInt(ONE_OF_TEN_USDC)) {
+      throw new Error(
+        `Insufficient total USDC balance. Need: ${ONE_OF_TEN_USDC}, Have: ${totalBalance}`,
+      );
     }
 
-    // 2. 調用購買 access NFT的合約
+    const tx = new Transaction();
+
+    // 主流做法：先 merge 所有 coins，再 split 精確金額
+    const primaryCoin = coins.data[0];
+    const primaryCoinArg = tx.object(primaryCoin.coinObjectId);
+
+    // Merge 其他所有 coins 到主 coin
+    if (coins.data.length > 1) {
+      const otherCoins = coins.data.slice(1).map((coin) => tx.object(coin.coinObjectId));
+      tx.mergeCoins(primaryCoinArg, otherCoins);
+    }
+
+    // Split 出精確需要的金額
+    const [coinToUse] = tx.splitCoins(primaryCoinArg, [tx.pure.u64(ONE_OF_TEN_USDC)]);
+
+    // 調用購買 NFT 的合約
     tx.moveCall({
       target: `${packageId}::main::buy_suiaudit_key`,
-      arguments: [
-        coinToUse,
-        tx.object(SUBSCRIPTION_SERVICE_ID),
-        tx.object(CLOCK_ID), // ← Clock
-      ],
+      arguments: [coinToUse, tx.object(serviceId), tx.object(CLOCK_ID)],
       typeArguments: [USDC_TYPE],
     });
 
@@ -146,14 +157,13 @@ function App() {
         },
         {
           onSuccess: async (result) => {
-            console.log('Subscription purchased successfully:', result);
-            // TODO: 查詢訂閱 nft 狀態
+            // console.log('Subscription purchased successfully:', result);
+            // 查詢訂閱 nft 狀態
             const service = await suiClient.getObject({
-              id: SUBSCRIPTION_SERVICE_ID,
+              id: serviceId,
               options: { showContent: true },
             });
             const service_fields = (service.data?.content as { fields: any })?.fields || {};
-            console.log('current service obj:', service_fields);
 
             const res = await suiClient.getOwnedObjects({
               owner: currentAccount?.address!,
@@ -165,7 +175,6 @@ function App() {
                 StructType: `${packageId}::subscription::Subscription`,
               },
             });
-            console.log('getOwnedObjects:', res);
 
             const clock = await suiClient.getObject({
               id: CLOCK_ID,
@@ -173,24 +182,80 @@ function App() {
             });
             const fields = (clock.data?.content as { fields: any })?.fields || {};
             const current_ms = fields.timestamp_ms;
-            console.log('clock:', clock, 'fields:', fields, 'current_ms:', current_ms);
 
-            const valid_subscription = res.data
-              .map((obj) => {
-                const fields = (obj!.data!.content as { fields: any }).fields;
-                const x = {
-                  id: fields?.id.id,
-                  created_at: parseInt(fields?.created_at),
-                  service_id: fields?.service_id,
-                };
-                return x;
-              })
-              .filter((item) => item.service_id === service_fields.id.id)
-              .find((item) => {
-                return item.created_at + parseInt(service_fields.ttl) > current_ms;
-              });
+            // 從交易結果中找出剛創建的 Subscription 物件
+            const createdSubscription = result.effects?.created?.find(
+              (item) =>
+                item.owner && typeof item.owner === 'object' && 'AddressOwner' in item.owner,
+            );
+
+            if (!createdSubscription) {
+              console.error('No subscription object created in transaction');
+              reject({ status: 'error', data: 'No subscription created' });
+              return;
+            }
+
+            const subscriptionId = createdSubscription.reference?.objectId;
+
+            // 使用重試機制獲取新創建的訂閱物件
+            const fetchSubscriptionWithRetry = async (
+              id: string,
+              maxRetries = 3,
+              initialDelay = 1000,
+            ) => {
+              for (let i = 0; i < maxRetries; i++) {
+                try {
+                  console.log(`Attempt ${i + 1}/${maxRetries}: Fetching subscription ${id}...`);
+                  const obj = await suiClient.getObject({
+                    id,
+                    options: { showContent: true },
+                  });
+
+                  if (obj.data?.content) {
+                    console.log(`✓ Successfully fetched subscription on attempt ${i + 1}`);
+                    return obj;
+                  }
+
+                  console.log(`Attempt ${i + 1}: Object exists but no content yet, retrying...`);
+                } catch (error) {
+                  console.error(`Attempt ${i + 1} failed:`, error);
+                }
+
+                if (i < maxRetries - 1) {
+                  const delay = initialDelay * Math.pow(1.5, i); // 指數退避：1s, 1.5s, 2.25s, 3.375s, 5.06s
+                  console.log(`Waiting ${delay}ms before next retry...`);
+                  await new Promise((resolve) => setTimeout(resolve, delay));
+                }
+              }
+              return null;
+            };
+
+            // 直接從鏈上獲取剛創建的訂閱物件詳細資訊
+            const subscriptionDetail = await fetchSubscriptionWithRetry(subscriptionId!);
+
+            if (!subscriptionDetail?.data?.content) {
+              console.error('Cannot fetch subscription object from chain after retries');
+              reject({ status: 'error', data: 'Cannot fetch subscription after retries' });
+              return;
+            }
+
+            const subFields = (subscriptionDetail.data.content as { fields: any })?.fields;
+
+            if (!subFields) {
+              console.error('Subscription object has no fields');
+              reject({ status: 'error', data: 'Invalid subscription object structure' });
+              return;
+            }
+
+            const valid_subscription = {
+              id: subFields.id?.id || subscriptionId,
+              created_at: parseInt(subFields.created_at || '0'),
+              service_id: subFields.service_id,
+            };
 
             console.log('valid_subscription:', valid_subscription);
+            console.log('service_fields:', service_fields);
+
             resolve({ status: 'ok', data: valid_subscription });
           },
           onError: (error) => {
@@ -213,19 +278,14 @@ function App() {
       }),
     });
 
-    console.log('generateFileReport:', resp);
-
     if (!resp.ok) {
       throw new Error(`API request failed: ${resp.status} ${resp.statusText}`);
     }
-
     return resp;
   };
 
   // walrus write get blob_id
   const uploadWalrus = (encryptedData: Uint8Array<ArrayBuffer>) => {
-    console.log('in uploadWalrus');
-
     return fetch(`${PUBLISHER_TESTNET}/v1/blobs?epochs=1`, {
       //service1
       method: 'PUT',
@@ -290,8 +350,6 @@ function App() {
     subscriptionId: string,
   ): MoveCallConstructor => {
     return (tx: Transaction, id: string) => {
-      console.log('in callSealApprove:', id);
-
       tx.moveCall({
         target: `${packageId}::subscription::seal_approve`,
         arguments: [
@@ -304,39 +362,41 @@ function App() {
     };
   };
 
-  // generate report
   const handleCreateReport = async () => {
     setIsLoading(true);
 
     try {
-      // generate report
       const file = await generateFileReport();
 
       if (!file) {
         throw new Error('Failed to generate report');
       }
 
+      // create service id onchain
+      const { status: serviceStatus, data: serviceId } = await createService();
+      if (serviceStatus !== 'ok') {
+        throw new Error('Failed to create service id');
+      }
+
       // encrypt report
       const nonce = crypto.getRandomValues(new Uint8Array(5));
-      const policyObjectBytes = fromHex(packageId);
-      const encryptionId = toHex(new Uint8Array([...policyObjectBytes, ...nonce])); //TODO: service id return by move call
+      const policyObjectBytes = fromHex(serviceId);
+      const encryptionId = toHex(new Uint8Array([...policyObjectBytes, ...nonce])); //service id return by move call
       console.log('encrypted id:', encryptionId);
 
       const arrayBuffer = await file.arrayBuffer();
       const { encryptedObject: encryptedBytes } = await sealClient.encrypt({
-        threshold: 2, // at least 2 verify servers
+        threshold: 2,
         packageId: packageId,
-        id: encryptionId, // 加密 ID = [服務 ID][隨機 nonce]
+        id: encryptionId,
         data: new Uint8Array(arrayBuffer),
       });
-      // console.log('handleCreateReport.encryptedBytes', encryptedBytes);
 
       // walrus write get blob_id
       const blobInfo = await uploadWalrus(encryptedBytes);
       if (!blobInfo.data) {
         throw new Error('Failed to upload to walrus', blobInfo.status);
       }
-      console.log('upload walrus, blob:', blobInfo);
 
       const { status, info } = parseBlobInfo(blobInfo.data, file.type);
       setInfo(info);
@@ -350,9 +410,8 @@ function App() {
       const coins = await getAllCoins(currentAccount!.address!, suiClient, USDC_TYPE);
 
       // 判斷NFT 絕對可否解密
-      // Buy NFT first, TODO: if already created
       const { status: validSubscriptionStatus, data: subscription } =
-        await buyAndVerifySubscription(coins);
+        await buyAndVerifySubscription(coins, serviceId);
       if (validSubscriptionStatus !== 'ok') {
         setValidSubscription(undefined);
         setValidStatus('invalid');
@@ -367,13 +426,12 @@ function App() {
     }
   };
 
-  const handleReportDownload = async () => {
+  const handleReportDownload = async (serviceId: string) => {
     try {
       if (!info || !validSubscription) {
         throw new Error('No storage or valid subscription info available');
       }
 
-      // 解密 & 下載
       // already has sessionkey
       if (
         currentSessionKey &&
@@ -382,17 +440,15 @@ function App() {
       ) {
         const moveCallConstructor = callSealApprove(
           packageId,
-          SUBSCRIPTION_SERVICE_ID, // service id from move call
+          serviceId, // service id from move call
           validSubscription.id, //subscription nft id
         );
-        // get decryptedFileUrls
         const decryptedFileUrl = await downloadAndDecrypt(
           info.blobId,
           currentSessionKey,
           suiClient,
           sealClient,
           moveCallConstructor,
-          setDecryptedFileUrls,
         );
 
         if (decryptedFileUrl && decryptedFileUrl.length > 0) {
@@ -413,7 +469,6 @@ function App() {
         ttlMin: SESSION_KEY_TTL_MIN,
         suiClient,
       });
-      console.log('sessionKey:', sessionKey);
 
       // sign to access subscription nft
       signPersonalMessage(
@@ -423,24 +478,18 @@ function App() {
         {
           onSuccess: async (result) => {
             await sessionKey.setPersonalMessageSignature(result.signature);
-            console.log('tie:', validSubscription);
 
             // tie session key with subscription nft
-            const moveCallConstructor = await callSealApprove(
-              packageId,
-              SUBSCRIPTION_SERVICE_ID,
-              validSubscription.id,
-            );
+            const moveCallConstructor = callSealApprove(packageId, serviceId, validSubscription.id);
             const decryptedFileUrl = await downloadAndDecrypt(
               info.blobId,
               sessionKey,
               suiClient,
               sealClient,
               moveCallConstructor,
-              setDecryptedFileUrls,
             );
             setCurrentSessionKey(sessionKey);
-            console.log('session key signed:', result, decryptedFileUrls);
+            console.log('session key signed:', result, decryptedFileUrl);
 
             if (decryptedFileUrl && decryptedFileUrl.length > 0) {
               const a = document.createElement('a');
@@ -479,7 +528,7 @@ function App() {
             </Button>
           )}
           {validStatus === 'valid' && (
-            <Button size="3" onClick={handleReportDownload} disabled={isLoading}>
+            <Button size="3" onClick={() => handleReportDownload(serviceId)} disabled={isLoading}>
               {isLoading ? 'Downloading...' : 'Download Report'}
             </Button>
           )}

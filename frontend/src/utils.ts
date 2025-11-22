@@ -12,7 +12,6 @@ export const downloadAndDecrypt = async (
   suiClient: SuiClient,
   sealClient: SealClient,
   moveCallConstructor: (tx: Transaction, id: string) => void,
-  setDecryptedFileUrls: (urls: string[]) => void,
 ) => {
   // First, download all files in parallel (ignore errors)
   const download = async () => {
@@ -56,7 +55,7 @@ export const downloadAndDecrypt = async (
     // Step 1: 先獲取密鑰
     await sealClient.fetchKeys({ ids: [fullId], txBytes, sessionKey, threshold: 2 });
     // // 本地解密（已有金鑰碎片）
-    // console.log('in seal decrypt');
+    console.log('in seal decrypt');
 
     const decryptedFile = await sealClient.decrypt({
       data: new Uint8Array(downloadResult),
@@ -65,13 +64,9 @@ export const downloadAndDecrypt = async (
     });
     // console.log('decryptedFile:', decryptedFile);
 
-    const blob = new Blob([new Uint8Array(decryptedFile)]); //TODO:limit only to PDF
-
-    // encrypted file
-    // const blob = new Blob([new Uint8Array(downloadResult)]); //TODO:limit only to PDF
-    console.log('blob:', blob);
-
+    const blob = new Blob([new Uint8Array(decryptedFile)], { type: 'application/pdf' });
     decryptedFileUrls.push(URL.createObjectURL(blob));
+    console.log('blob:', blob);
   } catch (err) {
     console.log(err);
     const errorMsg =
