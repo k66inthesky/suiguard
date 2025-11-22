@@ -1,13 +1,21 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+import uuid
 from typing import List, Optional, Dict
 import sys
 import os
+import io
 import logging
 from datetime import datetime
 from dotenv import load_dotenv
 import asyncio
+from pysui import SuiConfig, SyncClient
+from pysui.sui.sui_txn import SyncTransaction
+from pysui.sui.sui_types.scalars import ObjectID, SuiU64, SuiString
+
+
 
 # 載入 .env 文件
 load_dotenv()
@@ -55,6 +63,7 @@ app.add_middleware(
     allow_credentials=False,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],  # 允許所有 headers
+    max_age=3600,  # preflight 緩存 1 小時
 )
 
 # 🔄 定時任務調度器 (啟動時初始化)
@@ -154,6 +163,9 @@ class ContractAnalysisRequest(BaseModel):
     protocol: str
     modules: Optional[List[str]] = []
     timestamp: str
+
+class GenerateReportRequest(BaseModel):
+    package_id: str
 
 class RealTimeAnalysisRequest(BaseModel):
     """即時代碼分析請求"""
@@ -724,6 +736,56 @@ async def get_monitor_status():
         logger.error(f"Monitor status error: {e}")
         raise HTTPException(status_code=500, detail="Failed to get monitor status")
 
+@app.post("/api/reports")
+async def create_report(request: GenerateReportRequest):
+    try:
+        logger.info("--- 1. 執行 package_id 驗證 ---")
+        package_id = request.package_id.strip()
+        if not package_id.startswith("0x"):
+            raise HTTPException(status_code=400, detail="Invalid package_id format")
+        
+        if not package_id.startswith("0x"):
+            raise HTTPException(status_code=400, detail="Invalid package_id format: Must start with '0x'")
+        
+        logger.info(f"✅ package_id '{package_id}' 驗證通過。")
+
+        # 2. 檔案內容定義
+        logger.info("--- 2. 準備檔案內容 ---")
+        file_name = f"report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+        content = [
+            f"--- 報告生成 ---",
+            "這是檔案的第一行內容 (繁體中文測試)。",
+            f"This is the second line (English check).",
+            # "數字和特殊字元: 12345, !@#$",
+            # "處理的 Package ID: {package_id}",
+            "--- 文件結束 ---"
+        ]
+        output_data = "\n".join(content) # 使用換行符連接列表中的元素
+
+        # 3. 檔案寫入操作
+        # 使用 io.StringIO 創建一個記憶體中的文字檔案
+        logger.info(f"--- 3. 寫入檔案: {file_name} ---")
+        file_buffer = io.StringIO(output_data)
+     
+        # 3. 回傳 StreamingResponse
+        # content=file_buffer: 直接串流記憶體內容
+        # media_type: 告訴瀏覽器這是純文字
+        # headers: 設置 Content-Type 讓瀏覽器直接顯示文字內容而不是下載
+        return StreamingResponse(
+            content=file_buffer,
+            media_type="text/plain; charset=utf-8"
+        )
+    
+    except HTTPException as e:
+        # 重新拋出 HTTPException 讓 FastAPI 處理
+        logger.info(f"🛑 發生HTTP錯誤: {e.detail}", file=sys.stderr)
+        raise e
+        
+    except Exception as e:
+        # 處理任何其他未預期的伺服器錯誤
+        logger.info(f"🛑 發生未預期錯誤: {e}", file=sys.stderr)
+        raise HTTPException(status_code=500, detail="Internal Server Error during file generation")
+
 # 🔒 生產環境錯誤處理 - 不洩露內部信息
 from fastapi.responses import JSONResponse
 
@@ -774,5 +836,6 @@ if __name__ == "__main__":
         log_level="info",  # 🔒 生產環境使用info級別日誌
         access_log=False,  # 🔒 關閉詳細訪問日誌
         reload=False,      # 🔒 生產環境關閉自動重載
+        # reload=True,      # 🔒 生產環境關閉自動重載
         workers=1          # 🔒 單worker模式，避免並發問題
     )
