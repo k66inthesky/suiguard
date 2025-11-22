@@ -65,6 +65,10 @@ zklogin-integration/*.log
 # Docker
 *.log
 
+# Move/Sui contracts
+**/build/
+Move.lock
+
 # Temporary files
 *.tmp
 *.bak
