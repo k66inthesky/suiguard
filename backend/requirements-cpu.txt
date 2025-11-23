@@ -1,0 +1,47 @@
+# ============================================
+# SuiGuard Backend - CPU 版本依賴套件
+# ============================================
+# 適用於無 GPU 的環境
+
+# PyTorch (CPU 版本)
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+
+# Transformers & ML
+transformers>=4.30.0
+peft>=0.4.0
+accelerate>=0.20.0
+sentencepiece>=0.1.99
+protobuf>=3.20.0
+
+# FastAPI & Web
+fastapi>=0.104.1
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+python-multipart>=0.0.6
+
+# 異步 & HTTP
+aiohttp>=3.9.0
+httpx>=0.25.0
+asyncio>=3.4.3
+
+# 數據庫
+pymongo>=4.6.0
+motor>=3.3.0
+
+# 環境配置
+python-dotenv>=1.0.0
+
+# 日誌 & 監控
+colorlog>=6.8.0
+
+# 工具
+requests>=2.31.0
+psutil>=5.9.0
+
+# 測試 (可選)
+pytest>=7.4.0
+pytest-asyncio>=0.21.0

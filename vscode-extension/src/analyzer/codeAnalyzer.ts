@@ -39,7 +39,7 @@ export class CodeAnalyzer {
                 language: request.language,
                 analysisType: 'full'
             }, {
-                timeout: 30000, // 30秒超時
+                timeout: 180000, // 180秒超時 (ML模型載入+推理)
                 headers: {
                     'Content-Type': 'application/json',
                     'User-Agent': 'SuiAudit-VSCode-Extension/0.0.1'
@@ -92,7 +92,7 @@ export class CodeAnalyzer {
                 code: code,
                 analysisType: 'quick'
             }, {
-                timeout: 5000, // 快速分析只給5秒
+                timeout: 60000, // 快速分析給60秒 (ML模型可能需要載入)
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -188,7 +188,7 @@ export class CodeAnalyzer {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                timeout: 30000 // 30 秒超時
+                timeout: 180000 // 180 秒超時 (ML模型需要時間)
             });
 
             return {

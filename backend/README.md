@@ -55,7 +55,7 @@ pip install -r requirements.txt
 4. Run server:
 
 ```bash
-python main.py
+./stop_all_service.sh && ./start_ml_service.sh && ./start_api_service.sh
 ```
 
 ## API Endpoints
@@ -167,4 +167,4 @@ Returns service status and configuration validation.
 
 ---
 
-_by SuiGuard Team_
+_by SuiAudit Lab_
