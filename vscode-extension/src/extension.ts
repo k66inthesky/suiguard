@@ -130,7 +130,7 @@ function registerCommands(context: vscode.ExtensionContext) {
     const realTimeAnalyzeCommand = vscode.commands.registerCommand('suiguard.realTimeAnalyze', async () => {
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
-            vscode.window.showWarningMessage('請先打開要分析的 Move 代碼文件');
+            vscode.window.showWarningMessage('Please open a Move code file to analyze');
             return;
         }
 
@@ -141,32 +141,32 @@ function registerCommands(context: vscode.ExtensionContext) {
             : editor.document.getText(selection);
         
         const fileName = editor.document.fileName.split('/').pop() || 'unknown.move';
-        const analysisScope = selection.isEmpty ? '整個文件' : `第 ${selection.start.line + 1}-${selection.end.line + 1} 行`;
+        const analysisScope = selection.isEmpty ? 'Entire file' : `Lines ${selection.start.line + 1}-${selection.end.line + 1}`;
 
         if (!sourceCode.trim()) {
-            vscode.window.showWarningMessage('沒有代碼可供分析');
+            vscode.window.showWarningMessage('No code available for analysis');
             return;
         }
 
         try {
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
-                title: `🔍 正在分析 ${fileName} ${analysisScope}...`,
+                title: `🔍 Analyzing ${fileName} ${analysisScope}...`,
                 cancellable: false
             }, async (progress) => {
-                progress.report({ increment: 0, message: '連接分析服務...' });
+                progress.report({ increment: 0, message: 'Connecting to analysis service...' });
                 
                 const result = await codeAnalyzer.analyzeRealTime(sourceCode, fileName);
 
                 if (result.success) {
-                    progress.report({ increment: 100, message: '分析完成！' });
+                    progress.report({ increment: 100, message: 'Analysis complete!' });
                     showRealTimeAnalysisResult(result.analysis, fileName, analysisScope);
                 } else {
-                    vscode.window.showErrorMessage(`❌ 分析失敗: ${result.error}`);
+                    vscode.window.showErrorMessage(`❌ Analysis failed: ${result.error}`);
                 }
             });
         } catch (error) {
-            vscode.window.showErrorMessage(`❌ 分析錯誤: ${error}`);
+            vscode.window.showErrorMessage(`❌ Analysis error: ${error}`);
         }
     });
 
@@ -176,7 +176,7 @@ function registerCommands(context: vscode.ExtensionContext) {
 function showAnalysisResult(analysis: any, startLine: number, endLine: number) {
     const panel = vscode.window.createWebviewPanel(
         'suiguardAnalysis',
-        `SuiAudit 審計結果 (第 ${startLine}-${endLine} 行)`,
+        `SuiAudit Analysis Result (Lines ${startLine}-${endLine})`,
         vscode.ViewColumn.Beside,
         {
             enableScripts: true,
@@ -190,7 +190,7 @@ function showAnalysisResult(analysis: any, startLine: number, endLine: number) {
 function showRealTimeAnalysisResult(analysis: any, fileName: string, scope: string) {
     const panel = vscode.window.createWebviewPanel(
         'suiguardRealTimeAnalysis',
-        `🔍 SuiAudit 即時分析 - ${fileName}`,
+        `🔍 SuiAudit Real-time Analysis - ${fileName}`,
         vscode.ViewColumn.Beside,
         {
             enableScripts: true,
@@ -201,18 +201,114 @@ function showRealTimeAnalysisResult(analysis: any, fileName: string, scope: stri
     panel.webview.html = getRealTimeAnalysisWebviewContent(analysis, fileName, scope);
 }
 
+// 漏洞類型定義 (與 backend ML 模型一致)
+interface VulnerabilityClassification {
+    type: string;
+    icon: string;
+    color: string;
+    description: string;
+}
+
+const VULNERABILITY_TYPES: { [key: string]: VulnerabilityClassification } = {
+    'Resource Leak': {
+        type: 'Resource Leak',
+        icon: '💧',
+        color: '#ff6b6b',
+        description: 'Resource Leak - Resources not properly released or managed'
+    },
+    'Arithmetic Overflow': {
+        type: 'Arithmetic Overflow',
+        icon: '🔢',
+        color: '#ee5a6f',
+        description: 'Arithmetic Overflow - Numeric calculations may exceed limits'
+    },
+    'Unchecked Return': {
+        type: 'Unchecked Return',
+        icon: '⚠️',
+        color: '#feca57',
+        description: 'Unchecked Return - Function return values not validated'
+    },
+    'Cross-Module Pollution': {
+        type: 'Cross-Module Pollution',
+        icon: '🔀',
+        color: '#ff9ff3',
+        description: 'Cross-Module Pollution - Unsafe dependencies or data flow between modules'
+    },
+    'Capability Leak': {
+        type: 'Capability Leak',
+        icon: '🔐',
+        color: '#ff4757',
+        description: 'Capability Leak - Privilege management vulnerabilities'
+    }
+};
+
+// 檢測漏洞類型
+function detectVulnerabilityType(vulnerability: string): string {
+    const vulnLower = vulnerability.toLowerCase();
+    
+    // 資源洩漏關鍵字
+    if (vulnLower.includes('resource') || vulnLower.includes('資源') || 
+        vulnLower.includes('leak') || vulnLower.includes('洩漏') || vulnLower.includes('泄漏')) {
+        return 'Resource Leak';
+    }
+    
+    // 算術溢位關鍵字
+    if (vulnLower.includes('overflow') || vulnLower.includes('溢位') || vulnLower.includes('溢出') ||
+        vulnLower.includes('arithmetic') || vulnLower.includes('算術')) {
+        return 'Arithmetic Overflow';
+    }
+    
+    // 未檢查返回值關鍵字
+    if (vulnLower.includes('unchecked') || vulnLower.includes('未檢查') || vulnLower.includes('未检查') ||
+        vulnLower.includes('return') || vulnLower.includes('返回值')) {
+        return 'Unchecked Return';
+    }
+    
+    // 跨模組污染關鍵字
+    if (vulnLower.includes('cross-module') || vulnLower.includes('跨模組') || vulnLower.includes('跨模块') ||
+        vulnLower.includes('pollution') || vulnLower.includes('污染')) {
+        return 'Cross-Module Pollution';
+    }
+    
+    // 權限洩漏關鍵字
+    if (vulnLower.includes('capability') || vulnLower.includes('權限') || vulnLower.includes('权限') ||
+        vulnLower.includes('permission') || vulnLower.includes('access control')) {
+        return 'Capability Leak';
+    }
+    
+    return 'Unknown';
+}
+
+// 分類漏洞
+function classifyVulnerabilities(vulnerabilities: string[]): { [key: string]: string[] } {
+    const classified: { [key: string]: string[] } = {};
+    
+    vulnerabilities.forEach(vuln => {
+        const type = detectVulnerabilityType(vuln);
+        if (!classified[type]) {
+            classified[type] = [];
+        }
+        classified[type].push(vuln);
+    });
+    
+    return classified;
+}
+
 function getRealTimeAnalysisWebviewContent(analysis: any, fileName: string, scope: string): string {
     const riskLevel = analysis.risk_level || 'UNKNOWN';
     const riskColor = riskLevel === 'HIGH' || riskLevel === 'CRITICAL' ? '#ff4757' : 
                      riskLevel === 'MEDIUM' ? '#ffa502' : '#2ed573';
     
+    // 分析漏洞並分類
+    const classifiedVulnerabilities = classifyVulnerabilities(analysis.vulnerabilities || []);
+    
     return `
     <!DOCTYPE html>
-    <html lang="zh-TW">
+    <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>SuiAudit 即時分析結果</title>
+        <title>SuiAudit Real-time Analysis Result</title>
         <style>
             body {
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -324,14 +420,76 @@ function getRealTimeAnalysisWebviewContent(analysis: any, fileName: string, scop
                 padding: 30px;
                 color: var(--vscode-descriptionForeground);
             }
+            .vulnerability-classification {
+                margin: 20px 0;
+                padding: 15px;
+                background-color: var(--vscode-textCodeBlock-background);
+                border-radius: 8px;
+            }
+            .vulnerability-classification h4 {
+                margin-top: 0;
+                margin-bottom: 15px;
+                color: var(--vscode-textLink-foreground);
+            }
+            .classification-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 12px;
+                margin-top: 10px;
+            }
+            .classification-card {
+                background-color: var(--vscode-editor-background);
+                padding: 12px;
+                border-radius: 6px;
+                border-left-width: 4px;
+                border-left-style: solid;
+            }
+            .classification-header {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 8px;
+            }
+            .classification-icon {
+                font-size: 20px;
+            }
+            .classification-name {
+                font-weight: 600;
+                flex: 1;
+            }
+            .classification-count {
+                background-color: var(--vscode-badge-background);
+                color: var(--vscode-badge-foreground);
+                padding: 2px 8px;
+                border-radius: 12px;
+                font-size: 12px;
+                font-weight: bold;
+            }
+            .classification-desc {
+                font-size: 12px;
+                color: var(--vscode-descriptionForeground);
+                line-height: 1.4;
+            }
+            .vuln-type-badge {
+                display: inline-block;
+                padding: 4px 12px;
+                border-radius: 4px;
+                font-size: 11px;
+                font-weight: 600;
+                color: white;
+                margin-bottom: 8px;
+            }
+            .vuln-content {
+                line-height: 1.6;
+            }
         </style>
     </head>
     <body>
         <div class="header">
-            <h2>🛡️ SuiAudit 即時安全分析報告</h2>
+            <h2>🛡️ SuiAudit Real-time Security Analysis Report</h2>
             <div class="risk-badge">${riskLevel} RISK</div>
-            <p><strong>文件名稱:</strong> ${fileName}</p>
-            <p><strong>分析範圍:</strong> ${scope}</p>
+            <p><strong>File Name:</strong> ${fileName}</p>
+            <p><strong>Analysis Scope:</strong> ${scope}</p>
             
             <div class="score-container">
                 <div class="score-circle">
@@ -340,26 +498,60 @@ function getRealTimeAnalysisWebviewContent(analysis: any, fileName: string, scop
                     </div>
                 </div>
                 <div>
-                    <div><strong>風險分數:</strong> ${analysis.risk_score}/100</div>
-                    <div><strong>信心度:</strong> ${analysis.confidence.toFixed(1)}%</div>
+                    <div><strong>Risk Score:</strong> ${analysis.risk_score}/100</div>
+                    ${analysis.ml_analysis && analysis.ml_analysis.vulnerability_type ? 
+                        `<div><strong>Vulnerability Type:</strong> ${analysis.ml_analysis.vulnerability_type}</div>` : 
+                        '<div><strong>Vulnerability Type:</strong> No obvious vulnerabilities found</div>'
+                    }
                 </div>
             </div>
         </div>
 
         ${analysis.vulnerabilities && analysis.vulnerabilities.length > 0 ? `
         <div class="section">
-            <h3>🚨 發現的漏洞 (${analysis.vulnerabilities.length})</h3>
-            ${analysis.vulnerabilities.map((vuln: string) => `
-                <div class="vulnerability">
-                    ${vuln}
+            <h3>🚨 Vulnerabilities Found (${analysis.vulnerabilities.length})</h3>
+            
+            <!-- Vulnerability Classification Statistics -->
+            ${Object.keys(classifiedVulnerabilities).length > 0 ? `
+            <div class="vulnerability-classification">
+                <h4>📊 Vulnerability Classification Statistics</h4>
+                <div class="classification-grid">
+                    ${Object.entries(classifiedVulnerabilities).map(([type, vulns]: [string, any]) => {
+                        const vulnType = VULNERABILITY_TYPES[type];
+                        if (!vulnType || vulns.length === 0) return '';
+                        return `
+                        <div class="classification-card" style="border-left: 4px solid ${vulnType.color}">
+                            <div class="classification-header">
+                                <span class="classification-icon">${vulnType.icon}</span>
+                                <span class="classification-name">${vulnType.type}</span>
+                                <span class="classification-count">${vulns.length}</span>
+                            </div>
+                            <div class="classification-desc">${vulnType.description}</div>
+                        </div>
+                        `;
+                    }).join('')}
                 </div>
-            `).join('')}
+            </div>
+            ` : ''}
+            
+            <!-- Detailed Vulnerability List -->
+            <h4 style="margin-top: 20px;">📝 Detailed Vulnerability List</h4>
+            ${analysis.vulnerabilities.map((vuln: string) => {
+                const vulnType = detectVulnerabilityType(vuln);
+                const typeInfo = VULNERABILITY_TYPES[vulnType];
+                return `
+                <div class="vulnerability" style="border-left-color: ${typeInfo?.color || '#ff4757'}">
+                    ${typeInfo ? `<span class="vuln-type-badge" style="background-color: ${typeInfo.color}">${typeInfo.icon} ${typeInfo.type}</span>` : ''}
+                    <div class="vuln-content">${vuln}</div>
+                </div>
+                `;
+            }).join('')}
         </div>
         ` : ''}
 
         ${analysis.security_issues && analysis.security_issues.length > 0 ? `
         <div class="section">
-            <h3>⚠️  安全問題 (${analysis.security_issues.length})</h3>
+            <h3>⚠️  Security Issues (${analysis.security_issues.length})</h3>
             ${analysis.security_issues.map((issue: string) => `
                 <div class="security-issue">
                     ${issue}
@@ -370,7 +562,7 @@ function getRealTimeAnalysisWebviewContent(analysis: any, fileName: string, scop
 
         ${analysis.recommendations && analysis.recommendations.length > 0 ? `
         <div class="section">
-            <h3>💡 修復建議 (${analysis.recommendations.length})</h3>
+            <h3>💡 Remediation Recommendations (${analysis.recommendations.length})</h3>
             ${analysis.recommendations.map((rec: string) => `
                 <div class="recommendation">
                     ${rec}
@@ -382,30 +574,30 @@ function getRealTimeAnalysisWebviewContent(analysis: any, fileName: string, scop
         ${!analysis.vulnerabilities?.length && !analysis.security_issues?.length ? `
         <div class="section">
             <div class="empty-state">
-                <h3>✅ 太好了！</h3>
-                <p>未發現明顯的安全漏洞或問題</p>
+                <h3>✅ Great!</h3>
+                <p>No obvious security vulnerabilities or issues found</p>
             </div>
         </div>
         ` : ''}
 
         <div class="section">
-            <h3>📊 分析詳情</h3>
+            <h3>📊 Analysis Details</h3>
             <div class="meta-info">
                 <div class="meta-item">
-                    <div class="meta-label">分析方法</div>
+                    <div class="meta-label">Analysis Method</div>
                     <div class="meta-value">${analysis.ml_analysis?.analysis_method || 'N/A'}</div>
                 </div>
                 <div class="meta-item">
-                    <div class="meta-label">模型版本</div>
+                    <div class="meta-label">Model Version</div>
                     <div class="meta-value">${analysis.ml_analysis?.model_version || 'N/A'}</div>
                 </div>
                 <div class="meta-item">
-                    <div class="meta-label">處理時間</div>
+                    <div class="meta-label">Processing Time</div>
                     <div class="meta-value">${analysis.ml_analysis?.processing_time?.toFixed(2) || 0}s</div>
                 </div>
                 <div class="meta-item">
-                    <div class="meta-label">分析時間</div>
-                    <div class="meta-value">${new Date(analysis.timestamp).toLocaleString('zh-TW')}</div>
+                    <div class="meta-label">Analysis Time</div>
+                    <div class="meta-value">${new Date(analysis.timestamp).toLocaleString('en-US')}</div>
                 </div>
             </div>
         </div>
@@ -420,11 +612,11 @@ function getAnalysisWebviewContent(analysis: any, startLine: number, endLine: nu
     
     return `
     <!DOCTYPE html>
-    <html lang="zh-TW">
+    <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>SuiAudit 審計結果</title>
+        <title>SuiAudit Analysis Result</title>
         <style>
             body {
                 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;

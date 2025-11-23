@@ -52,6 +52,11 @@ env/
 backend/lora_models/
 backend/ml/models/
 backend/.venv/
+backend/offload/
+backend/*.pid
+backend/*.log
+backend/ml_service.log
+backend/api.log
 
 # VS Code Extension specific
 vscode-extension/node_modules/

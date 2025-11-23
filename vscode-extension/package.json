@@ -86,11 +86,11 @@
       "suiguard": [
         {
           "id": "suiguardAudit",
-          "name": "🔍 代碼安全審計"
+          "name": "🔍 Code Security Audit"
         },
         {
           "id": "suiguardLogin",
-          "name": "👤 會員功能"
+          "name": "👤 Member Features"
         }
       ]
     },

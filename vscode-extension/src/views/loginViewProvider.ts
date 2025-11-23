@@ -27,22 +27,22 @@ export class LoginViewProvider implements vscode.TreeDataProvider<LoginItem> {
 
         return Promise.resolve([
             new LoginItem(
-                '🔐 會員登入',
-                '點擊使用 zkLogin 登入',
+                '🔐 Member Login',
+                'Click to login with zkLogin',
                 vscode.TreeItemCollapsibleState.None,
                 {
                     command: 'suiguard.login',
-                    title: '登入',
+                    title: 'Login',
                     arguments: []
                 }
             ),
             new LoginItem(
-                '📖 什麼是 zkLogin?',
-                '了解 Sui 的零知識登入機制',
+                '📖 What is zkLogin?',
+                'Learn about Sui zero-knowledge login mechanism',
                 vscode.TreeItemCollapsibleState.None,
                 {
                     command: 'vscode.open',
-                    title: '開啟文檔',
+                    title: 'Open Documentation',
                     arguments: [vscode.Uri.parse('https://docs.sui.io/concepts/cryptography/zklogin')]
                 }
             )

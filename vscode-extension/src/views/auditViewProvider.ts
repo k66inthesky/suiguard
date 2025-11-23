@@ -21,56 +21,56 @@ export class AuditViewProvider implements vscode.TreeDataProvider<AuditItem> {
     getChildren(element?: AuditItem): Thenable<AuditItem[]> {
         return Promise.resolve([
             new AuditItem(
-                '🚀 即時漏洞分析',
-                '分析當前文件或選中代碼的安全漏洞',
+                '🚀 Real-time Vulnerability Analysis',
+                'Analyze security vulnerabilities in current file or selected code',
                 vscode.TreeItemCollapsibleState.None,
                 {
                     command: 'suiguard.realTimeAnalyze',
-                    title: '即時分析',
+                    title: 'Real-time Analysis',
                     arguments: []
                 },
                 '$(run)' // 添加圖標
             ),
             new AuditItem(
-                '🔍 分析選中代碼',
-                '選擇代碼後點擊進行深度分析',
+                '🔍 Analyze Selected Code',
+                'Select code and click for in-depth analysis',
                 vscode.TreeItemCollapsibleState.None,
                 {
                     command: 'suiguard.analyzeCode',
-                    title: '分析代碼',
+                    title: 'Analyze Code',
                     arguments: []
                 },
                 '$(search)'
             ),
             new AuditItem(
-                '⚡ 快速安全檢查',
-                '對選中代碼進行快速風險評估',
+                '⚡ Quick Security Check',
+                'Perform quick risk assessment on selected code',
                 vscode.TreeItemCollapsibleState.None,
                 {
                     command: 'suiguard.quickAnalyze',
-                    title: '快速檢查',
+                    title: 'Quick Check',
                     arguments: []
                 },
                 '$(zap)'
             ),
             new AuditItem(
-                '⚙️ 設定後端服務',
-                '配置 SuiAudit 後端服務地址',
+                '⚙️ Configure Backend Service',
+                'Configure SuiAudit backend service address',
                 vscode.TreeItemCollapsibleState.None,
                 {
                     command: 'suiguard.configureBackend',
-                    title: '設定後端',
+                    title: 'Configure Backend',
                     arguments: []
                 },
                 '$(gear)'
             ),
             new AuditItem(
-                '📊 查看審計記錄',
-                '查看過往的代碼審計結果',
+                '📊 View Audit History',
+                'View past code audit results',
                 vscode.TreeItemCollapsibleState.None,
                 {
                     command: 'suiguard.viewHistory',
-                    title: '審計記錄',
+                    title: 'Audit History',
                     arguments: []
                 },
                 '$(history)'

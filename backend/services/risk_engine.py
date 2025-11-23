@@ -4,10 +4,9 @@ from datetime import datetime
 import json
 import aiohttp
 import os
-from peft import LoraConfig, get_peft_model, PeftModel
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from sklearn.metrics import f1_score
-import torch
+import logging
+
+logger = logging.getLogger(__name__)
 
 class RiskEngine:
     """風險評估引擎 - 
@@ -16,15 +15,14 @@ class RiskEngine:
     """
     
     def __init__(self):
-        # LoRA 微調模型配置
-        self.model_path = os.getenv("LORA_MODEL_PATH", "./lora_models")
-        self.base_model_name = os.getenv("BASE_MODEL_NAME", "mistralai/Mistral-7B-v0.1")
-        self.dataset_path = os.getenv("DATASET_PATH", "ml/contract_bug_dataset.jsonl")
+        # ML 服務配置 (通過 HTTP 調用獨立服務)
+        self.ml_service_url = os.getenv("ML_SERVICE_URL", "http://localhost:8081")
+        self.ml_service_enabled = os.getenv("ENABLE_ML_SERVICE", "true").lower() == "true"
+        self.ml_service_timeout = int(os.getenv("ML_SERVICE_TIMEOUT", "30"))
         
-        # 初始化模型和分詞器
-        self.model = None
-        self.tokenizer = None
-        self._initialize_model()
+        logger.info(f"🔧 RiskEngine 初始化: ML 服務={'啟用' if self.ml_service_enabled else '禁用'}")
+        if self.ml_service_enabled:
+            logger.info(f"🔗 ML 服務 URL: {self.ml_service_url}")
         
         # 漏洞分類映射到風險分數區間 (100分制)
         self.vulnerability_score_ranges = {
@@ -79,130 +77,6 @@ class RiskEngine:
             "0x0000000000000000000000000000000000000000000000000000000000000002",  # Sui framework
             "0x0000000000000000000000000000000000000000000000000000000000000003"   # Sui system
         }
-    
-    def _initialize_model(self):
-        """初始化 LoRA 微調模型"""
-        try:
-            print(f"🔄 正在加載基礎模型: {self.base_model_name}")
-            
-            # 加載 tokenizer
-            self.tokenizer = AutoTokenizer.from_pretrained(self.base_model_name)
-            
-            # 加載基礎模型
-            base_model = AutoModelForCausalLM.from_pretrained(
-                self.base_model_name,
-                torch_dtype=torch.float16,
-                device_map="auto"
-            )
-            
-            # 配置 LoRA
-            lora_config = LoraConfig(
-                r=8,
-                lora_alpha=16,
-                target_modules=["q_proj", "v_proj"],
-                lora_dropout=0.05,
-                bias="none",
-                task_type="CAUSAL_LM"
-            )
-            
-            # 如果存在已訓練的模型，直接加載 LoRA 模型
-            if os.path.exists(self.model_path):
-                print(f"✅ 加載微調權重: {self.model_path}")
-                try:
-                    self.model = PeftModel.from_pretrained(base_model, self.model_path)
-                    print("✅ LoRA 微調模型加載成功")
-                except Exception as e:
-                    print(f"⚠️ LoRA 加載失敗，使用基礎模型: {e}")
-                    self.model = get_peft_model(base_model, lora_config)
-            else:
-                print(f"⚠️ 未找到微調模型，使用基礎 LoRA 配置: {self.model_path}")
-                self.model = get_peft_model(base_model, lora_config)
-            
-            self.model.eval()
-            print("✅ 模型加載完成並設置為評估模式")
-            
-        except Exception as e:
-            print(f"❌ 模型加載失敗: {e}")
-            self.model = None
-            self.tokenizer = None
-    
-    def load_dataset(self, jsonl_path: str) -> List[Dict]:
-        """加載訓練數據集"""
-        lines = []
-        try:
-            with open(jsonl_path, 'r', encoding='utf-8') as f:
-                for line in f:
-                    obj = json.loads(line)
-                    lines.append({
-                        "prompt": f"{obj['instruction']}\n{obj['input']}",
-                        "output": obj['output']
-                    })
-            print(f"✅ 成功加載 {len(lines)} 筆訓練數據")
-        except Exception as e:
-            print(f"❌ 數據集加載失敗: {e}")
-        return lines
-    
-    def extract_label(self, output_text: str) -> str:
-        """從輸出文本提取漏洞標籤"""
-        output_lower = output_text.lower()
-        
-        if "未發現明顯漏洞" in output_text or "未發現漏洞" in output_text:
-            return "safe"
-        elif "重入攻擊" in output_text or "reentrancy" in output_lower:
-            return "reentrancy"
-        elif "溢位" in output_text or "overflow" in output_lower:
-            return "overflow"
-        elif "存取控制" in output_text or "access_control" in output_lower:
-            return "access_control"
-        elif "邏輯錯誤" in output_text or "logic_error" in output_lower:
-            return "logic_error"
-        elif "隨機數" in output_text or "randomness" in output_lower:
-            return "randomness_error"
-        else:
-            return "other_bug"
-    
-    def calculate_f1_score(self, dataset: List[Dict]) -> float:
-        """計算模型的 F1 分數"""
-        if not self.model or not self.tokenizer:
-            print("❌ 模型未初始化，無法計算 F1 分數")
-            return 0.0
-        
-        y_true = []
-        y_pred = []
-        
-        print(f"📊 開始評估 {len(dataset)} 筆數據...")
-        
-        for i, sample in enumerate(dataset):
-            if i % 10 == 0:
-                print(f"  處理進度: {i}/{len(dataset)}")
-            
-            prompt = sample['prompt']
-            label_true = self.extract_label(sample['output'])
-            
-            # 生成預測
-            input_ids = self.tokenizer(prompt, return_tensors="pt", max_length=1024, truncation=True).input_ids
-            if torch.cuda.is_available():
-                input_ids = input_ids.to('cuda')
-            
-            with torch.no_grad():
-                output_ids = self.model.generate(
-                    input_ids=input_ids,
-                    max_new_tokens=128,
-                    temperature=0.7,
-                    do_sample=True,
-                    pad_token_id=self.tokenizer.eos_token_id
-                )
-            
-            output_text = self.tokenizer.decode(output_ids[0], skip_special_tokens=True)
-            label_pred = self.extract_label(output_text)
-            
-            y_true.append(label_true)
-            y_pred.append(label_pred)
-        
-        # 計算 F1 分數
-        f1 = f1_score(y_true, y_pred, average='macro')
-        print(f"✅ F1 分數（macro）: {f1:.4f}")
-        return f1
     
     def analyze_domain_risk(self, domain: str) -> Dict:
         """分析域名風險"""
@@ -395,113 +269,47 @@ class RiskEngine:
 
     async def classify_smart_contract_vulnerability(self, move_code: str) -> Dict:
         """
-        使用 LoRA 微調的 Llama-2 模型對 Move 智能合約代碼進行漏洞分類
-        分類為：reentrancy, overflow, access_control, logic_error, randomness_error, safe
+        通過 HTTP 調用獨立 ML 服務進行智能合約漏洞分類
+        分類為：access_control, logic_error, randomness_error, safe
         """
         try:
-            if not self.model or not self.tokenizer:
+            if not self.ml_service_enabled:
+                logger.info("ML 服務已禁用，返回安全分類")
                 return {
                     "classification": "safe",
-                    "confidence": 0.0,
-                    "reasoning": "模型未初始化",
-                    "error": "Model not initialized"
+                    "probabilities": {
+                        "access_control": 0.0,
+                        "logic_error": 0.0,
+                        "randomness_error": 0.0,
+                        "safe": 1.0
+                    },
+                    "max_probability": 1.0,
+                    "risk_score": 0,
+                    "risk_level": "SAFE",
+                    "reasoning": "ML 服務已禁用",
+                    "service_status": "disabled"
                 }
             
-            # 構建提示詞
-            instruction = "請找出Sui smart contract的惡意漏洞，並判斷危險等級"
-            prompt = f"{instruction}\n{move_code}"
+            # 調用 ML 服務
+            url = f"{self.ml_service_url}/api/analyze-vulnerability"
             
-            # 分詞
-            input_ids = self.tokenizer(
-                prompt,
-                return_tensors="pt",
-                max_length=1024,
-                truncation=True
-            ).input_ids
-            
-            # 移至 GPU（如果可用）
-            if torch.cuda.is_available():
-                input_ids = input_ids.to('cuda')
-            
-            # 生成預測
-            with torch.no_grad():
-                output_ids = self.model.generate(
-                    input_ids=input_ids,
-                    max_new_tokens=128,
-                    temperature=0.7,
-                    do_sample=True,
-                    pad_token_id=self.tokenizer.eos_token_id
-                )
-            
-            # 解碼輸出
-            output_text = self.tokenizer.decode(output_ids[0], skip_special_tokens=True)
-            
-            # 提取分類標籤
-            classification = self.extract_label(output_text)
-            
-            # 解析危險等級
-            confidence = 0.5  # 默認信心度
-            if "危險等級：高" in output_text or "高風險" in output_text:
-                confidence = 0.9
-                risk_level = "HIGH"
-            elif "危險等級：中" in output_text or "中風險" in output_text:
-                confidence = 0.6
-                risk_level = "MEDIUM"
-            elif "危險等級：低" in output_text or "低風險" in output_text:
-                confidence = 0.3
-                risk_level = "LOW"
-            else:
-                risk_level = "UNKNOWN"
-            
-            # 映射到標準分類
-            classification_map = {
-                "reentrancy": "access_control",
-                "overflow": "logic_error",
-                "access_control": "access_control",
-                "logic_error": "logic_error",
-                "randomness_error": "randomness_error",
-                "safe": "safe",
-                "other_bug": "logic_error"
-            }
-            
-            standard_classification = classification_map.get(classification, "safe")
-            
-            # 構建概率分布
-            probabilities = {
-                "access_control": 0.0,
-                "logic_error": 0.0,
-                "randomness_error": 0.0,
-                "safe": 0.0
-            }
-            
-            # 根據分類設置概率
-            if standard_classification in probabilities:
-                probabilities[standard_classification] = confidence
-                # 分配剩餘概率給其他類別
-                remaining_prob = 1.0 - confidence
-                other_count = len(probabilities) - 1
-                for key in probabilities:
-                    if key != standard_classification:
-                        probabilities[key] = remaining_prob / other_count
-            else:
-                probabilities["safe"] = 1.0
-            
-            # 計算風險分數
-            classification_result = {
-                "classification": standard_classification,
-                "probabilities": probabilities,
-                "max_probability": confidence,
-                "reasoning": output_text,
-                "original_classification": classification,
-                "risk_level": risk_level
-            }
-            
-            risk_score = self._calculate_probability_based_risk_score(classification_result)
-            classification_result["risk_score"] = risk_score
-            
-            return classification_result
+            async with aiohttp.ClientSession() as session:
+                async with session.post(
+                    url,
+                    json={"move_code": move_code},
+                    timeout=aiohttp.ClientTimeout(total=self.ml_service_timeout)
+                ) as response:
+                    if response.status == 200:
+                        result = await response.json()
+                        logger.info(f"✅ ML 服務分析完成: {result.get('classification')} (分數: {result.get('risk_score')})")
+                        return result
+                    else:
+                        error_text = await response.text()
+                        logger.error(f"❌ ML 服務返回錯誤: {response.status} - {error_text}")
+                        raise Exception(f"ML service returned {response.status}")
                         
-        except Exception as e:
+        except asyncio.TimeoutError:
+            logger.warning("⏱️ ML 服務超時，返回安全分類")
             return {
                 "classification": "safe",
                 "probabilities": {
@@ -512,19 +320,37 @@ class RiskEngine:
                 },
                 "max_probability": 1.0,
                 "risk_score": 0,
-                "reasoning": f"ML classification failed: {str(e)}",
-                "error": f"Exception: {str(e)}"
+                "risk_level": "SAFE",
+                "reasoning": "ML 服務超時",
+                "error": "timeout"
+            }
+        except Exception as e:
+            logger.error(f"❌ ML 分類失敗: {e}")
+            return {
+                "classification": "safe",
+                "probabilities": {
+                    "access_control": 0.0,
+                    "logic_error": 0.0,
+                    "randomness_error": 0.0,
+                    "safe": 1.0
+                },
+                "max_probability": 1.0,
+                "risk_score": 0,
+                "risk_level": "SAFE",
+                "reasoning": f"ML 服務錯誤: {str(e)}",
+                "error": str(e)
             }
 
     def _calculate_probability_based_risk_score(self, ml_result: Dict) -> int:
         """
         基於機率分布計算100分制風險分數
-        
-        計算策略：
-        1. 取最高機率的漏洞類型
-        2. 根據機率高低在該類型分數區間內計算具體分數
-        3. 考慮信心度調整最終分數
+        （注意：ML 服務已經計算好 risk_score，此方法用於兼容性）
         """
+        # ML 服務已經計算好風險分數，直接返回
+        if "risk_score" in ml_result:
+            return ml_result["risk_score"]
+        
+        # 回退邏輯（如果 ML 服務未提供 risk_score）
         try:
             classification = ml_result.get("classification", "safe")
             probabilities = ml_result.get("probabilities", {})
@@ -640,28 +466,51 @@ class RiskEngine:
                 # ML 分類可信度高時，給予更高權重
                 final_risk_score = (ml_risk_score * 0.6) + (rule_risk_score * 0.4)
                 confidence_boost = 0.1
+                # 使用 ML 100 分制風險分數判斷等級
+                ml_score_100 = ml_classification.get('risk_score', 0)
+                if ml_score_100 >= 70:
+                    risk_level = "HIGH"
+                    recommendation = "Reject - High security risk detected (ML+Rules)"
+                elif ml_score_100 >= 40:
+                    risk_level = "MEDIUM"
+                    recommendation = "Warning - Please proceed with caution (ML+Rules)"
+                else:
+                    risk_level = "LOW"
+                    recommendation = "Approve - Low risk detected (ML+Rules)"
             else:
                 # ML 分類不可用或可信度低時，主要依賴規則引擎
                 final_risk_score = (rule_risk_score * 0.8) + (ml_risk_score * 0.2)
                 confidence_boost = 0.0
-            
-            # 重新確定風險等級
-            if final_risk_score >= 0.7:
-                risk_level = "HIGH"
-                recommendation = "拒絕 - 檢測到高安全風險（ML+規則引擎）"
-            elif final_risk_score >= 0.4:
-                risk_level = "MEDIUM"
-                recommendation = "警告 - 請謹慎處理（ML+規則引擎）"
-            else:
-                risk_level = "LOW"
-                recommendation = "批准 - 檢測到低風險（ML+規則引擎）"
+                # 如果有 ML 分數，使用 ML 100 分制判斷（即使信心度低）
+                if ml_classification and ml_classification.get('risk_score', 0) > 0:
+                    ml_score_100 = ml_classification.get('risk_score', 0)
+                    if ml_score_100 >= 70:
+                        risk_level = "HIGH"
+                        recommendation = "Reject - High security risk detected (ML+Rules)"
+                    elif ml_score_100 >= 40:
+                        risk_level = "MEDIUM"
+                        recommendation = "Warning - Please proceed with caution (ML+Rules)"
+                    else:
+                        risk_level = "LOW"
+                        recommendation = "Approve - Low risk detected (ML+Rules)"
+                else:
+                    # 純規則引擎判斷
+                    if final_risk_score >= 0.7:
+                        risk_level = "HIGH"
+                        recommendation = "Reject - High security risk detected (Rules)"
+                    elif final_risk_score >= 0.4:
+                        risk_level = "MEDIUM"
+                        recommendation = "Warning - Please proceed with caution (Rules)"
+                    else:
+                        risk_level = "LOW"
+                        recommendation = "Approve - Low risk detected (Rules)"
             
             # 合併風險原因
             all_reasons = rule_based_analysis['reasons'].copy()
             if ml_classification and ml_classification.get('classification') != 'safe':
                 all_reasons.append(
-                    f"ML檢測到智能合約漏洞: {ml_classification['classification']} "
-                    f"(信心度: {ml_classification.get('confidence', 0):.2f})"
+                    f"ML detected smart contract vulnerability: {ml_classification['classification']} "
+                    f"(confidence: {ml_classification.get('confidence', 0):.2f})"
                 )
             
             return {
@@ -680,7 +529,8 @@ class RiskEngine:
                     "ml_enabled": bool(move_source_code.strip()),
                     "analysis_method": "hybrid_ml_rules",
                     "ml_risk_score_100": ml_classification.get('risk_score', 0) if ml_classification else 0,
-                    "ml_probabilities": ml_classification.get('probabilities', {}) if ml_classification else {}
+                    "ml_probabilities": ml_classification.get('probabilities', {}) if ml_classification else {},
+                    "processing_time": ml_classification.get('processing_time', 0) if ml_classification else 0
                 }
             }
             

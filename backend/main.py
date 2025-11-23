@@ -27,14 +27,24 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# 導入限流中間件
+from middleware.rate_limiter import RateLimitMiddleware
+
 # Import core services (靜默導入，減少控制台噪音)
 try:
     from services.move_analyzer import MoveCodeAnalyzer  
     from services.risk_engine import RiskEngine
     from services.pkg_version_service import PackageVersionService
     from schedule.schedule_revoke_certificate import start_scheduler
-    # 導入 Package Monitor
-    from contract_tracker.services.protocol_tracker import ProtocolTracker
+    
+    # 條件式導入 Package Monitor
+    enable_package_monitor = os.getenv("ENABLE_PACKAGE_MONITOR", "false").lower() == "true"
+    if enable_package_monitor:
+        from contract_tracker.services.protocol_tracker import ProtocolTracker
+        logger.info("✅ Package Monitor 已啟用")
+    else:
+        logger.info("⚠️ Package Monitor 已禁用 (設置 ENABLE_PACKAGE_MONITOR=true 啟用)")
+    
     logger.info("✅ All services imported successfully")
 except Exception as e:
     logger.error(f"❌ Service import failed: {e}")
@@ -63,6 +73,25 @@ app.add_middleware(
     max_age=3600,  # preflight 緩存 1 小時
 )
 
+# 🚦 添加限流中間件
+max_concurrent_ml = int(os.getenv("MAX_CONCURRENT_ML_REQUESTS", "1"))
+max_queue_size = int(os.getenv("MAX_ML_QUEUE_SIZE", "10"))
+
+app.add_middleware(
+    RateLimitMiddleware,
+    ml_endpoints=[
+        "/api/real-time-analyze",
+        "/api/analyze-connection",
+        "/api/request-certificate",
+        "/analyze-contract"
+    ],
+    max_concurrent_ml=max_concurrent_ml,
+    max_queue_size=max_queue_size,
+    request_timeout=60
+)
+
+logger.info(f"✅ 限流中間件已啟用: 最大並發={max_concurrent_ml}, 隊列大小={max_queue_size}")
+
 # 🔄 定時任務調度器 (啟動時初始化)
 @app.on_event("startup")
 async def startup_event():
@@ -77,25 +106,28 @@ async def startup_event():
     except Exception as e:
         logger.error(f"❌ Failed to start scheduler: {e}")
     
-    # 啟動 Package Monitor
-    try:
-        # 創建 Package Monitor 實例
-        protocol_tracker = ProtocolTracker()
-        app.state.protocol_tracker = protocol_tracker
-        
-        # 在背景任務中啟動監控
-        async def start_monitoring():
-            async with protocol_tracker:
-                await protocol_tracker.start_monitoring()
-        
-        # 創建背景任務
-        import asyncio
-        task = asyncio.create_task(start_monitoring())
-        app.state.monitor_task = task
-        
-        logger.info("✅ Package Monitor started")
-    except Exception as e:
-        logger.error(f"❌ Failed to start Package Monitor: {e}")
+    # 條件式啟動 Package Monitor
+    if enable_package_monitor:
+        try:
+            # 創建 Package Monitor 實例
+            protocol_tracker = ProtocolTracker()
+            app.state.protocol_tracker = protocol_tracker
+            
+            # 在背景任務中啟動監控
+            async def start_monitoring():
+                async with protocol_tracker:
+                    await protocol_tracker.start_monitoring()
+            
+            # 創建背景任務
+            task = asyncio.create_task(start_monitoring())
+            app.state.monitor_task = task
+            
+            logger.info("✅ Package Monitor started")
+        except Exception as e:
+            logger.error(f"❌ Failed to start Package Monitor: {e}")
+    else:
+        logger.info("⚠️ Package Monitor 已禁用")
+        app.state.protocol_tracker = None
 
 @app.on_event("shutdown")
 async def shutdown_event():
@@ -110,21 +142,21 @@ async def shutdown_event():
         except Exception as e:
             logger.error(f"❌ Error stopping scheduler: {e}")
     
-    # 停止 Package Monitor
-    if hasattr(app.state, 'protocol_tracker'):
+    # 停止 Package Monitor（如果啟用）
+    if hasattr(app.state, 'protocol_tracker') and app.state.protocol_tracker:
         try:
             await app.state.protocol_tracker.stop()
             logger.info("✅ Package Monitor stopped")
         except Exception as e:
             logger.error(f"❌ Error stopping Package Monitor: {e}")
-    
-    # 取消背景任務
-    if hasattr(app.state, 'monitor_task'):
-        try:
-            app.state.monitor_task.cancel()
-            logger.info("✅ Monitor task cancelled")
-        except Exception as e:
-            logger.error(f"❌ Error cancelling monitor task: {e}")
+        
+        # 取消背景任務
+        if hasattr(app.state, 'monitor_task'):
+            try:
+                app.state.monitor_task.cancel()
+                logger.info("✅ Monitor task cancelled")
+            except Exception as e:
+                logger.error(f"❌ Error cancelling monitor task: {e}")
 
 # Pydantic模型定義
 class ConnectionRequest(BaseModel):
@@ -232,14 +264,20 @@ async def real_time_analyze(request: RealTimeAnalysisRequest):
         risk_level = overall_risk["risk_level"]
         confidence = overall_risk["confidence"]
         
-        # 風險分數映射 (0-100)
-        risk_scores = {
-            "LOW": 25,
-            "MEDIUM": 50,
-            "HIGH": 75,
-            "CRITICAL": 95
-        }
-        risk_score = risk_scores.get(risk_level, 50)
+        # 使用 ML 模型回傳的實際風險分數（如果有的話）
+        if "ml_analysis" in overall_risk and "risk_score" in overall_risk.get("ml_analysis", {}):
+            risk_score = overall_risk["ml_analysis"]["risk_score"]
+            logger.info(f"✅ 使用 ML 模型風險分數: {risk_score}")
+        else:
+            # Fallback: 風險分數映射 (0-100)
+            risk_scores = {
+                "LOW": 25,
+                "MEDIUM": 50,
+                "HIGH": 75,
+                "CRITICAL": 95
+            }
+            risk_score = risk_scores.get(risk_level, 50)
+            logger.info(f"⚠️ 使用預設風險分數映射: {risk_score}")
         
         # 提取漏洞和建議
         vulnerabilities = []
@@ -255,19 +293,26 @@ async def real_time_analyze(request: RealTimeAnalysisRequest):
             else:
                 security_issues.append(reason)
         
+        # 提取漏洞類型（從 ML 分析結果）
+        vulnerability_type = None
+        if "ml_analysis" in overall_risk and overall_risk["ml_analysis"]:
+            vulnerability_type = overall_risk["ml_analysis"].get("vulnerability_type")
+        
         # 構建回應
         analysis_result = {
             "file_name": file_name,
             "risk_score": risk_score,
             "confidence": confidence * 100,  # 轉換為百分比
             "risk_level": risk_level,
+            "vulnerability_type": vulnerability_type,  # 漏洞類型（中文）
             "vulnerabilities": vulnerabilities,
             "security_issues": security_issues,
             "recommendations": recommendations or [overall_risk["recommendation"]],
             "ml_analysis": {
                 "analysis_method": overall_risk["details"].get("analysis_method", "rules_only"),
                 "model_version": "v1.0",
-                "processing_time": overall_risk["details"].get("processing_time", 0)
+                "processing_time": overall_risk["details"].get("processing_time", 0.0),
+                "vulnerability_type": vulnerability_type  # 同時在 ml_analysis 中提供
             },
             "timestamp": datetime.now().isoformat() + "Z"
         }
@@ -531,6 +576,11 @@ async def analyze_contract_for_monitor(request: ContractAnalysisRequest):
             else:
                 security_issues.append(reason)
         
+        # 提取漏洞類型（從 ML 分析結果）
+        vulnerability_type = None
+        if "ml_analysis" in overall_risk and overall_risk["ml_analysis"]:
+            vulnerability_type = overall_risk["ml_analysis"].get("vulnerability_type")
+        
         # 構建回應
         analysis_result = {
             "package_id": package_id,
@@ -538,13 +588,15 @@ async def analyze_contract_for_monitor(request: ContractAnalysisRequest):
             "risk_score": risk_score,
             "confidence": confidence * 100,  # 轉換為百分比
             "risk_level": risk_level,
+            "vulnerability_type": vulnerability_type,  # 漏洞類型（中文）
             "vulnerabilities": vulnerabilities,
             "security_issues": security_issues,
             "recommendations": recommendations or [overall_risk["recommendation"]],
             "ml_analysis": {
                 "analysis_method": overall_risk["details"].get("analysis_method", "rules_only"),
                 "model_version": "v1.0",
-                "processing_time": overall_risk["details"].get("processing_time", 0)
+                "processing_time": overall_risk["details"].get("processing_time", 0.0),
+                "vulnerability_type": vulnerability_type  # 同時在 ml_analysis 中提供
             },
             "timestamp": datetime.now().isoformat() + "Z"
         }
