@@ -55,7 +55,7 @@ pip install -r requirements.txt
 4. Run server:
 
 ```bash
-./stop_all_service.sh && ./start_ml_service.sh && ./start_api_service.sh
+./stop_all_services.sh && ./start_ml_service.sh && ./start_api_service.sh
 ```
 
 ## API Endpoints
