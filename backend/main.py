@@ -1,7 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+import uuid
 from typing import List, Optional, Dict
 import sys
 import os
@@ -10,6 +11,8 @@ import logging
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import asyncio
+
+
 
 # 載入 .env 文件
 load_dotenv()
@@ -67,6 +70,7 @@ app.add_middleware(
     allow_credentials=False,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],  # 允許所有 headers
+    max_age=3600,  # preflight 緩存 1 小時
 )
 
 # 🚦 添加限流中間件
@@ -810,7 +814,7 @@ async def create_report(request: GenerateReportRequest):
         
         # 寫死的建議
         recommendation = "Implement comprehensive access control mechanisms, add reentrancy guards to sensitive functions, and conduct thorough testing of arithmetic operations. Consider adding input validation and proper error handling to prevent resource leaks."
-        
+
         # 3. 生成專業的 PDF 報告
         logger.info("--- 3. 生成 PDF 報告 ---")
         file_name = f"SuiAudit_Report_{package_id[-8:]}_{datetime.now().strftime('%Y%m%d')}.pdf"
@@ -1180,5 +1184,6 @@ if __name__ == "__main__":
         log_level="info",  # 🔒 生產環境使用info級別日誌
         access_log=False,  # 🔒 關閉詳細訪問日誌
         reload=False,      # 🔒 生產環境關閉自動重載
+        # reload=True,      # 🔒 生產環境關閉自動重載
         workers=1          # 🔒 單worker模式，避免並發問題
     )

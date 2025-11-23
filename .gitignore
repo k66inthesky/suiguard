@@ -20,6 +20,9 @@ chrome-extension/manifest.js
 chrome-extension/pre-build.tsconfig.tsbuildinfo
 tsconfig.tsbuildinfo
 
+# bundler
+.vite
+
 # env files (keep .env.example for templates)
 **/.env
 **/.env.local
