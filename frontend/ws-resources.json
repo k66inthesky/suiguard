@@ -1,0 +1,15 @@
+{
+  "routes": {
+    "/": "/index.html",
+    "/audit": "/index.html",
+    "/blocklist": "/index.html",
+    "/certificate": "/index.html",
+    "/get-started": "/index.html",
+    "/package-check": "/index.html",
+    "/payment": "/index.html",
+    "/slush-cleanup-app": "/index.html",
+    "/website-check": "/index.html"
+  },
+  "site_name": "suiaudit",
+  "object_id": ""
+}
