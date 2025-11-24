@@ -1,19 +1,14 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
-
-// https://vitejs.dev/config/
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   resolve: {
     alias: {
-      '@': './src',
-      '@components': './src/components',
-      '@pages': './src/pages',
-      '@utils': './src/utils',
-      '@constants': './src/constants',
+      '@': '/src',
     },
   },
-  plugins: [react()],
+  plugins: [react(), tailwindcss()  ],
   server: {
     proxy: {
       '/aggregator1/v1': {

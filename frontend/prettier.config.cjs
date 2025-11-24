@@ -8,4 +8,5 @@ module.exports = {
   "jsxSingleQuote": false,
   "bracketSpacing": true,
   "proseWrap": "always",
+  "plugins": ["prettier-plugin-tailwindcss"]
 };
