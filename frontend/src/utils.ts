@@ -1,11 +1,9 @@
-import { SealClient, SessionKey, NoAccessError, EncryptedObject } from '@mysten/seal';
+import { EncryptedObject, NoAccessError, SealClient, SessionKey } from '@mysten/seal';
 import { SuiClient } from '@mysten/sui/client';
 import { Transaction } from '@mysten/sui/transactions';
-import React from 'react';
-import { aggregators, SUISCAN_URL_TESTNET, walrusServices } from './constants';
+import { AGGREGATOR_TESTNET, walrusServices } from './constants';
 
 export type MoveCallConstructor = (tx: Transaction, id: string) => void;
-
 export const downloadAndDecrypt = async (
   blobId: string,
   sessionKey: SessionKey,
@@ -17,9 +15,7 @@ export const downloadAndDecrypt = async (
   const download = async () => {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000);
-    const randomAggregator = aggregators[Math.floor(Math.random() * aggregators.length)];
-    const aggregatorUrl = `/${randomAggregator}/v1/blobs/${blobId}`;
-    const response = await fetch(aggregatorUrl, { signal: controller.signal });
+    const response = await fetch(`${AGGREGATOR_TESTNET}/v1/blobs/${blobId}`, { signal: controller.signal });
     clearTimeout(timeout);
     if (!response.ok) {
       return null;
@@ -29,7 +25,7 @@ export const downloadAndDecrypt = async (
 
   const downloadResult = await download();
 
-  console.log('download result:', downloadResult);
+  // console.log('download result:', downloadResult);
 
   if (!downloadResult) {
     const errorMsg =
@@ -43,19 +39,19 @@ export const downloadAndDecrypt = async (
 
   const fullId = EncryptedObject.parse(new Uint8Array(downloadResult)).id;
 
-  console.log('fullId:', fullId);
+  // console.log('fullId:', fullId);
 
   const tx = new Transaction();
   moveCallConstructor(tx, fullId);
 
   const txBytes = await tx.build({ client: suiClient, onlyTransactionKind: true });
-  console.log('txBytes:', txBytes);
+  // console.log('txBytes:', txBytes);
 
   try {
     // Step 1: 先獲取密鑰
     await sealClient.fetchKeys({ ids: [fullId], txBytes, sessionKey, threshold: 2 });
     // // 本地解密（已有金鑰碎片）
-    console.log('in seal decrypt');
+    // console.log('in seal decrypt');
 
     const decryptedFile = await sealClient.decrypt({
       data: new Uint8Array(downloadResult),
@@ -66,9 +62,9 @@ export const downloadAndDecrypt = async (
 
     const blob = new Blob([new Uint8Array(decryptedFile)], { type: 'application/pdf' });
     decryptedFileUrls.push(URL.createObjectURL(blob));
-    console.log('blob:', blob);
+    // console.log('blob:', blob);
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     const errorMsg =
       err instanceof NoAccessError
         ? 'No access to decryption keys'
@@ -78,24 +74,12 @@ export const downloadAndDecrypt = async (
   }
 
   if (decryptedFileUrls.length > 0) {
-    console.log('setting decrypted file urls:', decryptedFileUrls);
+    // console.log('setting decrypted file urls:', decryptedFileUrls);
     return decryptedFileUrls;
   }
-  console.log('decryptedFileUrls:', decryptedFileUrls);
+  // console.log('decryptedFileUrls:', decryptedFileUrls);
 };
 
-export const getObjectExplorerLink = (id: string): React.ReactElement => {
-  return React.createElement(
-    'a',
-    {
-      href: `${SUISCAN_URL_TESTNET}/object/${id}`,
-      target: '_blank',
-      rel: 'noopener noreferrer',
-      style: { textDecoration: 'underline' },
-    },
-    id.slice(0, 10) + '...',
-  );
-};
 
 // 生成檔案名稱
 export const generateFileName = () => {
@@ -106,7 +90,7 @@ export const generateFileName = () => {
   const hours = String(now.getHours()).padStart(2, '0');
   const minutes = String(now.getMinutes()).padStart(2, '0');
   const seconds = String(now.getSeconds()).padStart(2, '0');
-  return `report_${year}${month}${day}_${hours}${minutes}${seconds}.pdf`;
+  return `SuiAudit_Report_${year}${month}${day}_${hours}${minutes}${seconds}.pdf`;
 };
 
 export function getAggregatorUrl(path: string, selectedService: string): string {
@@ -121,7 +105,7 @@ export function getPublisherUrl(path: string, selectedService: string): string {
   return `${service?.publisherUrl}/v1/${cleanPath}`;
 }
 
-/** get all coins from wallet */
+/** Get all coins from wallet (handles fragmented USDC balances) */
 export async function getAllCoins(address: string, suiClient: SuiClient, coinType: string) {
   return address
     ? suiClient.getCoins({
@@ -150,6 +134,7 @@ export const convertTimestamp = (tstr: string) => {
 };
 
 export const isValidSuiPackageId = (input: string) => {
-  const suiPackageIdRegex = /^(0x|0X)?[a-fA-F0-9]{1,64}$/;
-  return suiPackageIdRegex.test(input);
+  // Must start with 0x or 0X, followed by 1-64 hex characters
+  const suiPackageIdRegex = /^(0x|0X)[a-fA-F0-9]{1,64}$/;
+  return suiPackageIdRegex.test(input.trim());
 };
