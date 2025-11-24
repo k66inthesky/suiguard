@@ -161,29 +161,29 @@ export default function PaymentPage() {
           onSuccess: async (result) => {
             // console.log('Subscription purchased successfully:', result);
             // 查詢訂閱 nft 狀態
-            const service = await suiClient.getObject({
-              id: serviceId,
-              options: { showContent: true },
-            });
-            const service_fields = (service.data?.content as { fields: any })?.fields || {};
+            // const service = await suiClient.getObject({
+            //   id: serviceId,
+            //   options: { showContent: true },
+            // });
+            // const service_fields = (service.data?.content as { fields: any })?.fields || {};
 
-            const res = await suiClient.getOwnedObjects({
-              owner: currentAccount?.address!,
-              options: {
-                showContent: true,
-                showType: true,
-              },
-              filter: {
-                StructType: `${packageId}::subscription::Subscription`,
-              },
-            });
+            // const res = await suiClient.getOwnedObjects({
+            //   owner: currentAccount?.address!,
+            //   options: {
+            //     showContent: true,
+            //     showType: true,
+            //   },
+            //   filter: {
+            //     StructType: `${packageId}::subscription::Subscription`,
+            //   },
+            // });
 
-            const clock = await suiClient.getObject({
-              id: CLOCK_ID,
-              options: { showContent: true },
-            });
-            const fields = (clock.data?.content as { fields: any })?.fields || {};
-            const current_ms = fields.timestamp_ms;
+            // const clock = await suiClient.getObject({
+            //   id: CLOCK_ID,
+            //   options: { showContent: true },
+            // });
+            // const fields = (clock.data?.content as { fields: any })?.fields || {};
+            // const current_ms = fields.timestamp_ms;
 
             // 從交易結果中找出剛創建的 Subscription 物件
             const createdSubscription = result.effects?.created?.find(
