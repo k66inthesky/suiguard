@@ -8,7 +8,7 @@
 
 Demo Video: https://youtu.be/K3_QJftZTKo
 
-Walrus site: `https://suiaudit.wal.app/`
+Visit our website: `https://suiaudit.wal.app/`
 
 ---
 
@@ -44,10 +44,16 @@ Although Sui's Move language is fast and secure, ecosystem partners still occasi
 - Oct. 22, 2025 - HOH x SUI Hackathon preparation
 - Oct. 24, 2025 - Team Direction Alignment
 - Nov. 07, 2025 - Sui-Move security paper study session
-- Nov. 08, 2025 - Walrus hackathon task planning and assignment
+- Nov. 08, 2025 - Walrus Hackathon task planning and assignment
 - Nov. 11, 2025 - Data Format Discussion, Sui Move Smart Contract Study
 - Nov. 13, 2025 - Data & Testing Method Discussion, Task Detail Planning
-
+- Nov. 16, 2025 - Identify general LLM hallucination toward Sui-Move smart contract
+- Nov. 18, 2025 - Discussion on Walrus and Seal implementation
+- Nov. 19, 2025 - Walrus Hackathon sync-up
+- Nov. 21, 2025 - Debug for issuing subscription NFT using Seal
+- Nov. 22, 2025 - Integration on payment feature for Walrus haulout Hackathon
+- Nov. 23, 2025 - Integration test for Walrus haulout Hackathon
+- Nov. 24, 2025 - Finalize Walrus demo video
 
 ---
 
@@ -86,11 +92,7 @@ Before you raise an issue, kindly do:
 
 👨‍💻 [Emily](https://github.com/lienweb) - Frontend, UI/UX, System Design, Sui-Move labeling
 
-## Member
-
-👨‍💻 [Jack](https://github.com/RSTsai) - Sui-Move labeling
-
-## How to join as Member? (Below we referred you as `candidate`)
+## [Pending]How to join as Member? (Below we referred you as `candidate`)
 
 ### Recruitment Process:
 
@@ -111,7 +113,7 @@ Before you raise an issue, kindly do:
 ### Evaluation Period To Become A Member
 
 - About one month(will adjust due to product roadmap or upcoming events)
-  > eg. Interviewed on Sep. 28, but ended evaluation period on Oct. 22 due to HoH hackathon.
+  > eg. Interviewed on Sep. 28, but ended evaluation period on Oct. 22 due to HoH Hackathon.
 - At the end of every month, all `core team member` fill in a review form to decide whether `candidate` will become a `member` at SuiAudit Lab.
 
 ## License
