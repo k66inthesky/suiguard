@@ -41,8 +41,8 @@
     "update-deps": "pnpm up --interactive"
   },
   "dependencies": {
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react": "^19.1.2",
+    "react-dom": "^19.1.2"
   },
   "devDependencies": {
     "@eslint/compat": "^1.3.2",
