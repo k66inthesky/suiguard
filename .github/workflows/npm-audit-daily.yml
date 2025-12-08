@@ -1,0 +1,67 @@
+name: Daily NPM Security Audit
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  security-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run NPM Audit (critical only)
+        run: npm audit --audit-level=critical
+
+  notify:
+    needs: security-check
+    runs-on: ubuntu-latest
+    if: needs.security-check.result == 'failure'
+    steps:
+      - name: Create issue mentioning repo owner and last committer
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const sha = context.sha; // commit that triggered the run
+            // try to get commit author login (if linked to GH account)
+            let authorLogin = null;
+            try {
+              const { data } = await github.rest.repos.getCommit({ owner, repo, ref: sha });
+              authorLogin = data.author?.login || null;
+            } catch (e) {
+              // ignore fetch errors, we'll still create the issue
+            }
+
+            const mentions = [`@${owner}`];
+            if (authorLogin) mentions.push(`@${authorLogin}`);
+
+            const title = `[Automated] npm audit: critical vulnerabilities found`;
+            const runUrl = `https://github.com/${owner}/${repo}/actions/runs/${context.runId}`;
+            const body = [
+              `Automatic notification: npm audit (critical) failed.`,
+              ``,
+              `- Repo: ${owner}/${repo}`,
+              `- Commit: ${sha}`,
+              `- Actions run: ${runUrl}`,
+(MOVE THIS FILE TO .github/workflows/npm-audit-daily.yml; NO CHANGES TO CONTENTS REQUIRED)
+              ``,
+              mentions.length ? `Notifying: ${mentions.join(' ')}` : `No mention targets found.`
+            ].join('\n');
+
+            await github.rest.issues.create({ owner, repo, title, body });
