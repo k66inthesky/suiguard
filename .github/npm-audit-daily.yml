@@ -1,34 +1,66 @@
 name: Daily NPM Security Audit
 
 on:
-  # daily
   schedule:
     - cron: '0 0 * * *'
-  # or manual
   workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
 
 jobs:
   security-check:
     runs-on: ubuntu-latest
     steps:
-      # 第一步：下載程式碼
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # 第二步：設定 Node.js 環境 (使用最新的 LTS 版本)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
 
-      # 第三步：依照 Lock File 還原環境
-      # 使用 npm ci 確保安裝的版本與 package-lock.json 完全一致
-      # 如果 lock file 有問題，這一步就會先擋下來
-      - name: Install dependencies (Clean Install)
+      - name: Install dependencies
         run: npm ci
 
-      # 第四步：執行安全檢查 (只抓 Critical 等級)
-      # --audit-level=critical : 只有發現「嚴重 (Critical)」漏洞時才會失敗 (Fail)
-      # 如果失敗，GitHub 會自動寄信通知儲存庫擁有者與最後修改者
-      - name: Run NPM Audit (Critical Only)
+      - name: Run NPM Audit (critical only)
         run: npm audit --audit-level=critical
+
+  notify:
+    needs: security-check
+    runs-on: ubuntu-latest
+    if: needs.security-check.result == 'failure'
+    steps:
+      - name: Create issue mentioning repo owner and last committer
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const sha = context.sha; // commit that triggered the run
+            // try to get commit author login (if linked to GH account)
+            let authorLogin = null;
+            try {
+              const { data } = await github.rest.repos.getCommit({ owner, repo, ref: sha });
+              authorLogin = data.author?.login || null;
+            } catch (e) {
+              // ignore fetch errors, we'll still create the issue
+            }
+
+            const mentions = [`@${owner}`];
+            if (authorLogin) mentions.push(`@${authorLogin}`);
+
+            const title = `[Automated] npm audit: critical vulnerabilities found`;
+            const runUrl = `https://github.com/${owner}/${repo}/actions/runs/${context.runId}`;
+            const body = [
+              `Automatic notification: npm audit (critical) failed.`,
+              ``,
+              `- Repo: ${owner}/${repo}`,
+              `- Commit: ${sha}`,
+              `- Actions run: ${runUrl}`,
+              ``,
+              mentions.length ? `Notifying: ${mentions.join(' ')}` : `No mention targets found.`
+            ].join('\n');
+
+            await github.rest.issues.create({ owner, repo, title, body });
