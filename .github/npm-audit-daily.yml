@@ -59,6 +59,7 @@ jobs:
               `- Repo: ${owner}/${repo}`,
               `- Commit: ${sha}`,
               `- Actions run: ${runUrl}`,
+(MOVE THIS FILE TO .github/workflows/npm-audit-daily.yml; NO CHANGES TO CONTENTS REQUIRED)
               ``,
               mentions.length ? `Notifying: ${mentions.join(' ')}` : `No mention targets found.`
             ].join('\n');
