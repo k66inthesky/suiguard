@@ -6,7 +6,9 @@
 
 🛡️ AI-Powered Sui-Move Code Audit Solution
 
-Demo Video: https://youtu.be/K3_QJftZTKo
+🎬English Demo Video: https://youtu.be/4-jDcgFBjss
+
+🎬Chinese Demo & System Architecture Detail Video: https://youtu.be/K3_QJftZTKo
 
 Visit our website: `https://suiaudit.wal.app/`
 
@@ -54,6 +56,7 @@ Although Sui's Move language is fast and secure, ecosystem partners still occasi
 - Nov. 22, 2025 - Integration on payment feature for Walrus haulout Hackathon
 - Nov. 23, 2025 - Integration test for Walrus haulout Hackathon
 - Nov. 24, 2025 - Finalize Walrus demo video
+- Dec. 05, 2025 - Interview a candidate, including Sui-move, DeFi, test.
 
 ---
 
@@ -94,27 +97,10 @@ Before you raise an issue, kindly do:
 
 ## [Pending]How to join as Member? (Below we referred you as `candidate`)
 
-### Recruitment Process:
+### Recruitment Process & Interview Dates:
 
-1. Fill in the [form](https://forms.gle/oE3AUChoMqkhruD79), duration: 30 min.
-2. `Candidate` needs to raise an issue using the tag `join as member`, with title [Join As Member], and use the same email when filling out the form, so we can speed up the process.
-3. We will email the `candidate` to schedule a virtual interview. Please make sure you will attend (normally we interview once a month, it will be announced in this `README`).
-4. We will ask questions based on the information filled out by the `candidate`. We want to learn about you and your motivation, to make sure you and SuiAudit Lab have the same goal, and to avoid false expectations from the `candidate`.
-5. During the interview, we have a small break, during which core team members will evaluate each `candidate` based on a 1-10 score evaluation. Those scoring above 8 will join as `members`. We will announce the result immediately.
-6. Evaluation Period: `candidate` and `core team` will need to work together for a month, during which the `candidate` needs to deliver the assigned tasks on time.
-7. During the evaluation period, if the `candidate` underperforms (e.g., incomplete tasks, late for meetings for more than 10 minutes without giving notice in advance...), we will DM you and kindly ask you to leave the meeting.
-8. The `core team` will evaluate based on the `candidate`'s performance. Those scoring above 8 will become members of SuiAudit Lab, and we will list you on this README and announce at our next meeting.
+> In December 2025, please contact: k66inthesky@gmail.com
 
-### Interview Dates:
-
-- `Core team members` will post available interview dates here. `Candidates` should select one date from the list. No alternative times will be offered, so please clear your schedule accordingly.
-- Interviews are scheduled at month-end when maximum `core team members` are available.
-
-### Evaluation Period To Become A Member
-
-- About one month(will adjust due to product roadmap or upcoming events)
-  > eg. Interviewed on Sep. 28, but ended evaluation period on Oct. 22 due to HoH Hackathon.
-- At the end of every month, all `core team member` fill in a review form to decide whether `candidate` will become a `member` at SuiAudit Lab.
 
 ## License
 
