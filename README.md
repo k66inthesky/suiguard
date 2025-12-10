@@ -57,7 +57,7 @@ Although Sui's Move language is fast and secure, ecosystem partners still occasi
 - Nov. 23, 2025 - Integration test for Walrus haulout Hackathon
 - Nov. 24, 2025 - Finalize Walrus demo video
 - Dec. 05, 2025 - Interview a candidate, including Sui-move, DeFi, test.
-
+- Dec. 09, 2025 - Define 2 kinds of SuiAudit models, and introduce them in the meeting.
 ---
 
 ## Features
