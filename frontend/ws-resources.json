@@ -10,6 +10,13 @@
     "/slush-cleanup-app": "/index.html",
     "/website-check": "/index.html"
   },
-  "site_name": "suiaudit",
+   "metadata": {
+    "link": "https://suiaudit.wal.app",
+    "image_url": "https://github.com/k66inthesky/suiguard/blob/main/frontend/public/favicon.svg",
+    "description": "SuiAudit is an AI-powered code audit solution on SUI blockchain, providing security analysis for smart contracts and dApps.",
+    "project_url": "https://github.com/k66inthesky/suiguard",
+    "creator": "SuiAuditLab"
+  },
+  "site_name": "SuiAudit",
   "object_id": ""
 }
