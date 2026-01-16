@@ -60,7 +60,8 @@ Although Sui's Move language is fast and secure, ecosystem partners still occasi
 - Dec. 09, 2025 - Define 2 kinds of SuiAudit models, and introduce them in the meeting.
 - Dec. 17, 2025 - Pure1 model - Add 30 row data.
 - Dec. 24, 2025 - Pure1 model - Add 40 row data.
-- Jan. 07, 2026 - Pure1 model - VSCode User Flow changed(plan to add Static Analysis), and refactor data sheet. 
+- Jan. 07, 2026 - Pure1 model - VSCode User Flow changed(plan to add Static Analysis), and refactor data sheet.
+- Jan. 16, 2026 - Pure1 model - 5-fold cross validation, and better accuracy on 6+1 main classes.
 ---
 
 ## Features
