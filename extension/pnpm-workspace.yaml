@@ -3,7 +3,6 @@ packages:
   - pages/*
   - packages/*
   - tests/*
-
 onlyBuiltDependencies:
   - '@parcel/watcher'
   - '@swc/core'
@@ -11,3 +10,12 @@ onlyBuiltDependencies:
   - esbuild
   - geckodriver
   - unrs-resolver
+overrides:
+  vite@>=6.0.0 <=6.4.0: '>=6.4.1'
+  vite@>=7.1.0 <=7.1.10: '>=7.1.11'
+  tar@=7.5.1: '>=7.5.2'
+  js-yaml@>=4.0.0 <4.1.1: '>=4.1.1'
+  glob@>=10.2.0 <10.5.0: '>=10.5.0'
+  glob@>=11.0.0 <11.1.0: '>=11.1.0'
+  valibot@>=0.31.0 <1.2.0: '>=1.2.0'
+  qs@<6.14.1: '>=6.14.1'

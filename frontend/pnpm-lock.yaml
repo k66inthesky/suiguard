@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
+  react-router@>=7.0.0 <7.12.0: '>=7.12.0'
+  react-router@>=7.0.0 <7.9.6: '>=7.9.6'
+  react-router@>=7.0.0 <=7.11.0: '>=7.12.0'
   valibot@>=0.31.0 <1.2.0: '>=1.2.0'
 
 importers:
@@ -51,10 +54,10 @@ importers:
         specifier: ^5.90.12
         version: 5.90.12(react@19.2.0)
       react:
-        specifier: ^19.1.2
+        specifier: ^19.1.4
         version: 19.2.0
       react-dom:
-        specifier: ^19.1.2
+        specifier: ^19.1.4
         version: 19.2.0(react@19.2.0)
       react-router-dom:
         specifier: ^7.4.1
@@ -2667,8 +2670,8 @@ packages:
       react: '>=18'
       react-dom: '>=18'
 
-  react-router@7.9.5:
-    resolution: {integrity: sha512-JmxqrnBZ6E9hWmf02jzNn9Jm3UqyeimyiwzD69NjxGySG6lIz/1LVPsoTCwN7NBX2XjCEa1LIX5EMz1j2b6u6A==}
+  react-router@7.12.0:
+    resolution: {integrity: sha512-kTPDYPFzDVGIIGNLS5VJykK0HfHLY5MF3b+xj0/tTyNYL1gF1qs7u67Z9jEhQk2sQ98SUaHxlG31g1JtF7IfVw==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       react: '>=18'
@@ -5832,9 +5835,9 @@ snapshots:
     dependencies:
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
-      react-router: 7.9.5(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      react-router: 7.12.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
 
-  react-router@7.9.5(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
+  react-router@7.12.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
     dependencies:
       cookie: 1.0.2
       react: 19.2.0
