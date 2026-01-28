@@ -63,6 +63,7 @@ Although Sui's Move language is fast and secure, ecosystem partners still occasi
 - Jan. 07, 2026 - Pure1 model - VSCode User Flow changed(plan to add Static Analysis), and refactor data sheet.
 - Jan. 16, 2026 - Pure1 model - 5-fold cross validation, and better accuracy on 6+1 main classes.
 - Jan. 21, 2026 - Pure1 model - training and get more row data. 
+- Jan. 28, 2026 - Pure1 model - Add 25 row data.
 ---
 
 ## Features
